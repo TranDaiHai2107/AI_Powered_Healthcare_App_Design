@@ -1,0 +1,9 @@
+{
+  "name": "healthcare-firebase-seed",
+  "version": "1.0.0",
+  "description": "Seed data script for Healthcare App Firestore",
+  "main": "seed-firestore.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}
