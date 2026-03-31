@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Cross / Plus medical symbol -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M46,30 L62,30 L62,46 L78,46 L78,62 L62,62 L62,78 L46,78 L46,62 L30,62 L30,46 L46,46 Z" />
+
+    <!-- Heart shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.3"
+        android:pathData="M54,85 C54,85 25,65 25,48 C25,38 33,32 42,32 C48,32 52,35 54,39 C56,35 60,32 66,32 C75,32 83,38 83,48 C83,65 54,85 54,85 Z" />
+</vector>
