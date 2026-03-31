@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Healthcare Pastel Color Palette -->
+    <color name="pastel_blue">#FFA8D5E2</color>
+    <color name="pastel_blue_dark">#FF8FC5D8</color>
+    <color name="pastel_blue_light">#FFD4EAF1</color>
+    <color name="pastel_blue_10">#1AA8D5E2</color>
+    <color name="pastel_blue_20">#33A8D5E2</color>
+
+    <color name="pastel_mint">#FFB4E7CE</color>
+    <color name="pastel_mint_dark">#FF9DDBB9</color>
+    <color name="pastel_mint_20">#33B4E7CE</color>
+    <color name="pastel_mint_30">#4DB4E7CE</color>
+
+    <color name="pastel_lavender">#FFD4C5F9</color>
+    <color name="pastel_lavender_dark">#FFC4B5E9</color>
+    <color name="pastel_lavender_20">#33D4C5F9</color>
+    <color name="pastel_lavender_30">#4DD4C5F9</color>
+
+    <color name="pastel_coral">#FFFFB8A0</color>
+    <color name="pastel_coral_20">#33FFB8A0</color>
+
+    <color name="healthcare_white">#FFFFFFFF</color>
+    <color name="healthcare_gray">#FFF5F7FA</color>
+    <color name="healthcare_dark">#FF2D3748</color>
+    <color name="healthcare_text">#FF4A5568</color>
+    <color name="healthcare_muted">#FF718096</color>
+
+    <color name="border_color">#14000000</color>
+    <color name="yellow_star">#FFFBBF24</color>
+    <color name="red_cancel">#FFFC8181</color>
+    <color name="red_100">#FFFEE2E2</color>
+    <color name="red_700">#FFB91C1C</color>
+    <color name="yellow_100">#FFFEF3C7</color>
+    <color name="yellow_700">#FFA16207</color>
+    <color name="blue_100">#FFDBEAFE</color>
+    <color name="blue_700">#FF1D4ED8</color>
+
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="transparent">#00000000</color>
+</resources>
