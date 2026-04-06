@@ -17,6 +17,7 @@ public class Doctor {
     private String nextAvailable;
     private String bio;
     private String availableSlots;
+    private String status;
 
     public Doctor() {}
 
@@ -50,4 +51,6 @@ public class Doctor {
     public String[] getAvailableSlotsArray() {
         return availableSlots != null ? availableSlots.split(",") : new String[0];
     }
+    public String getStatus() {return status;}
+    public void setStatus(String status) {this.status = status}
 }
