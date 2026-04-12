@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/healthcare_gray">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottomNav">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="48dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Medical Records"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnUpload"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/bg_rounded_card"
+                    android:clipToOutline="true"
+                    android:padding="8dp"
+                    android:src="@android:drawable/ic_menu_upload"
+                    app:tint="@color/pastel_blue_dark" />
+
+            </LinearLayout>
+
+            <!-- Filter Chips -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:paddingBottom="12dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/chipContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="All"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipAppointments"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Appointments"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipPrescriptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Prescriptions"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipLabResults"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="8dp"
+                        android:text="Lab Results"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="18dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipNotes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Notes"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="16dp"
+                        app:cornerRadius="18dp" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <!-- Quick Action Cards -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/pastel_blue_20">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_upload"
+                            app:tint="@color/pastel_blue_dark" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="Upload\nDocuments"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/pastel_mint_20">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:src="@android:drawable/ic_menu_recent_history"
+                            app:tint="@color/pastel_mint_dark" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="Health\nTimeline"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Records List -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecords"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemIconTint="@color/healthcare_muted"
+        app:itemTextColor="@color/healthcare_muted"
+        app:itemActiveIndicatorStyle="@null"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
