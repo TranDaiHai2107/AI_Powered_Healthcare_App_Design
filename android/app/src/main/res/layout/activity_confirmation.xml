@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient_mint_blue"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="80dp"
+        android:paddingBottom="32dp">
+
+        <!-- Checkmark Circle -->
+        <FrameLayout
+            android:layout_width="120dp"
+            android:layout_height="120dp">
+
+            <View
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:background="@drawable/bg_confirmation_circle"
+                android:elevation="4dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="5dp"
+                android:gravity="center"
+                android:text="✓"
+                android:textColor="@color/pastel_mint_dark"
+                android:textSize="52sp"
+                android:textStyle="bold" />
+
+        </FrameLayout>
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Booking Confirmed!"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Your appointment has been\nsuccessfully booked"
+            android:textColor="@color/healthcare_muted"
+            android:textSize="15sp" />
+
+        <!-- Booking Details Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Booking ID -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Booking ID"
+                    android:textColor="@color/healthcare_muted"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvBookingId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="HC-20260306-A1B2" />
+
+                <!-- QR Placeholder -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_rounded_input"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📱"
+                        android:textSize="48sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Show this QR code at the hospital"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginVertical="16dp"
+                    android:background="@color/border_color" />
+
+                <!-- Doctor -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Doctor"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvDoctor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/healthcare_dark"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Dr. Sarah Johnson" />
+
+                </LinearLayout>
+
+                <!-- Date -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Date"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/healthcare_dark"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Mar 6, 2026" />
+
+                </LinearLayout>
+
+                <!-- Time -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Time"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/healthcare_dark"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="09:00 AM" />
+
+                </LinearLayout>
+
+                <!-- Total -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:id="@+id/tvTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/pastel_blue_dark"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        tools:text="$125" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Action Buttons -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDownloadReceipt"
+            style="@style/RoundedOutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Download Receipt"
+            app:icon="@android:drawable/stat_sys_download"
+            app:iconGravity="textStart" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnViewAppointments"
+            style="@style/RoundedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:text="View My Appointments" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnBackToHome"
+            style="@style/RoundedOutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:text="Back to Home"
+            app:icon="@android:drawable/ic_menu_revert"
+            app:iconGravity="textStart" />
+
+    </LinearLayout>
+
+</ScrollView>

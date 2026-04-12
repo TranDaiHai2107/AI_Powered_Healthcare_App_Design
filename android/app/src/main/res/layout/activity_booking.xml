@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/healthcare_gray">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_rounded_card"
+            android:clipToOutline="true"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/healthcare_dark" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Book Appointment"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Progress Bar -->
+    <LinearLayout
+        android:id="@+id/progressBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="16dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <!-- Step 1 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <View
+                    android:id="@+id/stepCircle1"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_step_active" />
+
+                <ImageView
+                    android:id="@+id/stepIcon1"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_agenda"
+                    app:tint="@color/white" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/stepLabel1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Service"
+                android:textColor="@color/healthcare_dark"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <!-- Line 1-2 -->
+        <View
+            android:id="@+id/stepLine1"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/bg_step_line_inactive" />
+
+        <!-- Step 2 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <View
+                    android:id="@+id/stepCircle2"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_step_inactive" />
+
+                <ImageView
+                    android:id="@+id/stepIcon2"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    app:tint="@color/healthcare_muted" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/stepLabel2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Date&amp;Time"
+                android:textColor="@color/healthcare_muted"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <!-- Line 2-3 -->
+        <View
+            android:id="@+id/stepLine2"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/bg_step_line_inactive" />
+
+        <!-- Step 3 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <View
+                    android:id="@+id/stepCircle3"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_step_inactive" />
+
+                <ImageView
+                    android:id="@+id/stepIcon3"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="@color/healthcare_muted" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/stepLabel3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Details"
+                android:textColor="@color/healthcare_muted"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <!-- Line 3-4 -->
+        <View
+            android:id="@+id/stepLine3"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="4dp"
+            android:layout_marginBottom="18dp"
+            android:background="@drawable/bg_step_line_inactive" />
+
+        <!-- Step 4 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="32dp"
+                android:layout_height="32dp">
+
+                <View
+                    android:id="@+id/stepCircle4"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_step_inactive" />
+
+                <ImageView
+                    android:id="@+id/stepIcon4"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_gravity="center"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    app:tint="@color/healthcare_muted" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/stepLabel4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Payment"
+                android:textColor="@color/healthcare_muted"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/progressBarContainer"
+        app:layout_constraintBottom_toTopOf="@id/bottomBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Doctor Info Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardDoctorInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <ImageView
+                        android:id="@+id/imgDoctor"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_rounded_image"
+                        android:clipToOutline="true"
+                        android:scaleType="centerCrop"
+                        tools:src="@android:drawable/sym_def_app_icon" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvDoctorName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            tools:text="Dr. Sarah Johnson" />
+
+                        <TextView
+                            android:id="@+id/tvSpecialization"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:textColor="@color/healthcare_muted"
+                            android:textSize="13sp"
+                            tools:text="Cardiologist" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvFee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/pastel_blue_dark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="$120" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Step 1: Select Service Type -->
+            <LinearLayout
+                android:id="@+id/layoutStep1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Service Type"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnServiceGeneral"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="12dp"
+                    android:text="🩺  General Checkup"
+                    android:textAllCaps="false"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:strokeColor="@color/border_color" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnServiceSpecialist"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:text="👨‍⚕️  Specialist Consultation"
+                    android:textAllCaps="false"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:strokeColor="@color/border_color" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnServiceFollowUp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:text="🔄  Follow-up Visit"
+                    android:textAllCaps="false"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:strokeColor="@color/border_color" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnServiceEmergency"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="8dp"
+                    android:text="🚑  Emergency"
+                    android:textAllCaps="false"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp"
+                    app:strokeColor="@color/border_color" />
+
+            </LinearLayout>
+
+            <!-- Step 2: Select Date & Time -->
+            <LinearLayout
+                android:id="@+id/layoutStep2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Select Date"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/layoutDateButtons"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Select Time"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <GridLayout
+                    android:id="@+id/gridTimeSlots"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:columnCount="3" />
+
+            </LinearLayout>
+
+            <!-- Step 3: Symptoms / Notes -->
+            <LinearLayout
+                android:id="@+id/layoutStep3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Symptoms / Notes"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Describe your symptoms or add any notes for the doctor"
+                    android:textColor="@color/healthcare_muted"
+                    android:textSize="13sp" />
+
+                <EditText
+                    android:id="@+id/etSymptoms"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_rounded_input"
+                    android:gravity="top|start"
+                    android:hint="e.g., I have been experiencing chest pain for the past 3 days..."
+                    android:inputType="textMultiLine"
+                    android:padding="16dp"
+                    android:textColor="@color/healthcare_dark"
+                    android:textColorHint="@color/healthcare_muted"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Step 4: Booking Summary -->
+            <LinearLayout
+                android:id="@+id/layoutStep4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Booking Summary"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Service -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Service"
+                                android:textColor="@color/healthcare_muted"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tvSummaryService"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/healthcare_dark"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="General Checkup" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="12dp"
+                            android:background="@color/border_color" />
+
+                        <!-- Date -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Date"
+                                android:textColor="@color/healthcare_muted"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tvSummaryDate"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/healthcare_dark"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="Mar 6, 2026" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="12dp"
+                            android:background="@color/border_color" />
+
+                        <!-- Time -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Time"
+                                android:textColor="@color/healthcare_muted"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/tvSummaryTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/healthcare_dark"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                tools:text="09:00 AM" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="12dp"
+                            android:background="@color/border_color" />
+
+                        <!-- Total -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Total"
+                                android:textColor="@color/healthcare_dark"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvSummaryTotal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/pastel_blue_dark"
+                                android:textSize="18sp"
+                                android:textStyle="bold"
+                                tools:text="$120" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Fixed Bottom Bar -->
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContinue"
+            style="@style/RoundedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Continue"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
