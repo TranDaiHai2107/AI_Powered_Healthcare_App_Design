@@ -6,9 +6,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.core.content.FileProvider;
+import android.net.Uri;
+import java.io.File;
+import com.healthcare.app.util.ReceiptGenerator;
+import com.healthcare.app.util.ReminderScheduler;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,11 +53,53 @@ public class AppointmentsActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         adapter = new AppointmentAdapter(this, new ArrayList<>(), new AppointmentAdapter.OnAppointmentClickListener() {
-            @Override public void onCheckIn(String appointmentId) {
+            @Override
+            public void onCheckIn(String appointmentId) {
                 Intent intent = new Intent(AppointmentsActivity.this, CheckInActivity.class);
-                intent.putExtra("appointmentId", appointmentId); startActivity(intent);
+                intent.putExtra("appointmentId", appointmentId);
+                startActivity(intent);
             }
-            @Override public void onViewRecords() { startActivity(new Intent(AppointmentsActivity.this, MedicalRecordsActivity.class)); }
+            @Override
+            public void onViewRecords() {
+                startActivity(new Intent(AppointmentsActivity.this, MedicalRecordsActivity.class));
+            }
+            @Override
+            public void onCancel(String appointmentId, String documentId) {
+                showCancelConfirmDialog(appointmentId, documentId);
+            }
+            @Override
+            public void onReschedule(Appointment appointment) {
+                Intent intent = new Intent(AppointmentsActivity.this, RescheduleActivity.class);
+                intent.putExtra("appointmentId", appointment.getAppointmentId());
+                intent.putExtra("doctorId", appointment.getDoctorId());
+                intent.putExtra("currentDate", appointment.getDate());
+                intent.putExtra("currentTime", appointment.getTime());
+                startActivity(intent);
+            }
+            @Override
+            public void onDownloadReceipt(Appointment appointment) {
+                try {
+                    File pdf = ReceiptGenerator.generateReceipt(AppointmentsActivity.this,
+                            appointment.getAppointmentId(), appointment.getDoctorName(),
+                            appointment.getDate(), appointment.getTime(),
+                            appointment.getType() != null ? appointment.getType() : "Consultation",
+                            appointment.getConsultationFee() != null ? appointment.getConsultationFee() : 0.0, "Card");
+
+                    if (pdf != null) {
+                        Uri uri = FileProvider.getUriForFile(AppointmentsActivity.this,
+                                getPackageName() + ".fileprovider", pdf);
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(uri, "application/pdf");
+                        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivity(intent);
+                        Toast.makeText(AppointmentsActivity.this, "Receipt saved to Downloads", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(AppointmentsActivity.this, "Failed to generate receipt", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Toast.makeText(AppointmentsActivity.this, "Failed to generate receipt", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
         binding.rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         binding.rvAppointments.setAdapter(adapter);
@@ -94,6 +142,38 @@ public class AppointmentsActivity extends AppCompatActivity {
         binding.layoutEmpty.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
         binding.rvAppointments.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
         binding.tvEmptyMessage.setText("No " + status + " appointments");
+    }
+
+    private void showCancelConfirmDialog(String appointmentId, String documentId) {
+        new AlertDialog.Builder(this)
+                .setTitle("Cancel Appointment")
+                .setMessage("Are you sure you want to cancel this appointment?")
+                .setPositiveButton("Yes, Cancel", (dialog, which) -> cancelAppointment(appointmentId, documentId))
+                .setNegativeButton("Keep it", null)
+                .show();
+    }
+
+    private void cancelAppointment(String appointmentId, String documentId) {
+        // Try by appointmentId field first
+        db.collection("appointments")
+                .whereEqualTo("appointmentId", appointmentId)
+                .limit(1).get()
+                .addOnSuccessListener(querySnapshot -> {
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        doc.getReference().update("status", "cancelled")
+                                .addOnSuccessListener(aVoid -> {
+                                    ReminderScheduler.cancelReminder(this, appointmentId);
+                                    Toast.makeText(this, "Appointment cancelled", Toast.LENGTH_SHORT).show();
+                                    loadAppointments(currentStatus);
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(this, "Cancel failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        return;
+                    }
+                    Toast.makeText(this, "Appointment not found", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Cancel failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void setupBottomNav() {
