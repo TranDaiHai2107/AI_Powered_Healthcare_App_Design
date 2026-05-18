@@ -111,26 +111,23 @@ AI-Powered Healthcare App Design/
 
 Một vài màn hình như `PaymentMethodsActivity`, `AppSettingsActivity`, `SupportActivity`, `AdminDashboardActivity` và `ReviewActivity` đang dựng UI bằng Java code thay vì XML layout riêng.
 
-## Firestore collections đang dùng
+## Firestore collections hiện có
 
 | Collection | Mục đích |
 | --- | --- |
-| `users` | Hồ sơ người dùng, avatar, thông tin liên hệ |
-| `users/{uid}/login_history` | Lịch sử đăng nhập theo thiết bị |
-| `hospitals` | Danh sách bệnh viện |
+| `appointments` | Lịch hẹn, trạng thái, QR/check-in |
 | `doctors` | Danh sách bác sĩ |
-| `appointments` | Lịch hẹn, trạng thái, QR/check-in, review flag |
-| `payments` | Giao dịch thanh toán |
+| `family_members` | Người thân của user |
+| `hospitals` | Danh sách bệnh viện |
+| `insurance` | Thông tin bảo hiểm |
 | `medical_records` | Hồ sơ y tế |
 | `notifications` | Thông báo trong app |
-| `insurance` | Thông tin bảo hiểm |
-| `family_members` | Người thân của user |
 | `payment_methods` | Phương thức thanh toán đã lưu |
+| `payments` | Giao dịch thanh toán |
 | `user_settings` | Cài đặt notification/email/dark mode |
-| `reviews` | Đánh giá bác sĩ sau lịch hẹn |
-| `support_tickets` | Ticket hỗ trợ khách hàng |
-| `vouchers` | Voucher do admin tạo |
-| `content_banners` | Banner/content do admin tạo |
+| `users` | Hồ sơ người dùng, avatar, thông tin liên hệ |
+
+Một số màn hình trong code có thể tạo thêm collection khi dùng các tính năng tương ứng, ví dụ `reviews`, `support_tickets`, `vouchers`, `content_banners` hoặc subcollection `users/{uid}/login_history`. Các collection này chưa xuất hiện trong Firebase Console hiện tại nếu chưa có document nào được tạo.
 
 ## Luồng đặt lịch
 
