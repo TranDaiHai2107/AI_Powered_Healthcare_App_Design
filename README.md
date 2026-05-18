@@ -1,305 +1,220 @@
-# AI-Powered Healthcare App
+# Healthcare Android App
 
-Ứng dụng chăm sóc sức khỏe **Android Native** (Java) sử dụng **Firebase** (Authentication, Cloud Firestore, Cloud Storage).
+Ứng dụng chăm sóc sức khỏe **Android Native** viết bằng **Java + XML**, dùng **Firebase** cho xác thực, dữ liệu thời gian thực, lưu trữ tệp và dữ liệu seed demo.
 
----
+> Tên thư mục dự án vẫn là `AI-Powered Healthcare App Design`, nhưng phần đã xây dựng hiện tại là một app Android native. Trong source hiện chưa có module AI/backend riêng.
 
-## Mục lục
+## Tổng quan
 
-1. [Tổng quan kiến trúc](#tổng-quan-kiến-trúc)
-2. [Cấu trúc dự án](#cấu-trúc-dự-án)
-3. [Yêu cầu cài đặt](#yêu-cầu-cài-đặt)
-4. [Hướng dẫn cài đặt & chạy](#hướng-dẫn-cài-đặt--chạy)
-5. [Tài khoản mặc định](#tài-khoản-mặc-định)
-6. [Cấu trúc Firestore Database](#cấu-trúc-firestore-database)
-7. [Màn hình ứng dụng](#màn-hình-ứng-dụng)
-8. [Tech Stack](#tech-stack)
-
----
-
-## Tổng quan kiến trúc
-
-```
-┌──────────────────┐                    ┌──────────────────────────────────────┐
-│                  │    Firebase SDK     │            Firebase (Google)         │
-│   Android App    │ ◄───────────────►  │                                      │
-│   (Java + XML)   │                    │  🔐 Authentication (Email/Password)  │
-│                  │                    │  📦 Cloud Firestore (NoSQL Database) │
-│   Material 3 UI  │                    │  📁 Cloud Storage (Files/Images)     │
-│                  │                    │                                      │
-└──────────────────┘                    └──────────────────────────────────────┘
-   Android Studio                           Firebase Console (web)
+```text
+Android app (Java + XML + ViewBinding)
+        |
+        | Firebase SDK
+        v
+Firebase Authentication
+Cloud Firestore
+Firebase Storage
 ```
 
-**Không cần backend server riêng** — Firebase xử lý tất cả.
+App không có backend server riêng. Các thao tác đăng nhập, đăng ký, đọc/ghi hồ sơ, lịch hẹn, thanh toán, thông báo, cấu hình người dùng và tệp đính kèm đều đi qua Firebase.
 
----
+## Tính năng đã xây dựng
+
+- Onboarding 3 màn hình, đăng nhập email/password, đăng nhập Google, đăng ký, quên mật khẩu và đổi mật khẩu.
+- Trang Home hiển thị bệnh viện gần đây, bác sĩ nổi bật, lối tắt đặt lịch, hồ sơ y tế, tìm bác sĩ và bảo hiểm.
+- Tìm kiếm bác sĩ/bệnh viện với bộ lọc, chip chuyên khoa, khoảng giá, đánh giá và kinh nghiệm.
+- Chi tiết bác sĩ, chi tiết bệnh viện, danh sách bác sĩ theo bệnh viện.
+- Luồng đặt lịch: chọn dịch vụ, ngày, giờ, bệnh nhân/người thân, triệu chứng, thanh toán và xác nhận.
+- Thanh toán tạo đồng thời bản ghi `payments` và `appointments` bằng Firestore `WriteBatch`.
+- Quản lý lịch hẹn: xem theo trạng thái, check-in, hủy lịch, đổi lịch, mở hóa đơn PDF và đánh giá sau khám.
+- Check-in bằng QR/appointment id, cập nhật trạng thái hàng đợi và hỗ trợ màn hình scan cho nhân viên.
+- Hồ sơ y tế, chi tiết hồ sơ, mở link đính kèm và upload tệp lên Firebase Storage.
+- Thông báo, đánh dấu tất cả là đã đọc.
+- Bảo hiểm y tế.
+- Hồ sơ cá nhân: xem/cập nhật thông tin, upload ảnh đại diện, đăng xuất.
+- Quản lý người thân, phương thức thanh toán, cài đặt app, lịch sử đăng nhập, hỗ trợ khách hàng.
+- Dashboard admin dạng giao diện native code: xem collection, cập nhật trạng thái bác sĩ, tạo voucher, tạo content banner và mở màn hình staff scan.
+- Nhắc lịch khám trước 1 giờ bằng `AlarmManager` + `BroadcastReceiver`.
+- Tạo hóa đơn PDF bằng `PdfDocument`.
 
 ## Cấu trúc dự án
 
-```
+```text
 AI-Powered Healthcare App Design/
-│
-├── android/                              ← Android Native App
-│   ├── build.gradle                      ← Root build (AGP 8.2.2, Google Services plugin)
-│   ├── app/build.gradle                  ← App build (Firebase BOM, Glide, ZXing)
-│   ├── settings.gradle                   ← Project: HealthcareApp
-│   ├── gradle.properties                 ← JVM args, AndroidX
-│   ├── local.properties                  ← Android SDK path
-│   ├── gradlew.bat / gradlew            ← Gradle Wrapper (8.5)
-│   ├── gradle/wrapper/
-│   │   ├── gradle-wrapper.jar
-│   │   └── gradle-wrapper.properties
-│   └── app/src/main/
-│       ├── AndroidManifest.xml
-│       ├── google-services.json          ← ⚠️ BẠN CẦN TẠO FILE NÀY (xem hướng dẫn)
-│       ├── java/com/healthcare/app/
-│       │   ├── activity/                 ← 18 Activity classes
-│       │   │   ├── OnboardingActivity    ← Màn hình giới thiệu (LAUNCHER)
-│       │   │   ├── LoginActivity         ← Firebase Auth đăng nhập
-│       │   │   ├── RegisterActivity      ← Firebase Auth đăng ký
-│       │   │   ├── ForgotPasswordActivity← Firebase Auth reset password
-│       │   │   ├── ResetPasswordActivity ← Đặt lại mật khẩu
-│       │   │   ├── HomeActivity          ← Trang chủ (Firestore: doctors, hospitals)
-│       │   │   ├── SearchActivity        ← Tìm kiếm (local filter)
-│       │   │   ├── DoctorDetailActivity  ← Chi tiết bác sĩ (Firestore)
-│       │   │   ├── HospitalDetailActivity← Chi tiết bệnh viện (Firestore)
-│       │   │   ├── BookingActivity       ← Đặt lịch khám (Firestore)
-│       │   │   ├── PaymentActivity       ← Thanh toán (Firestore)
-│       │   │   ├── ConfirmationActivity  ← Xác nhận đặt lịch
-│       │   │   ├── AppointmentsActivity  ← Danh sách lịch hẹn (Firestore query)
-│       │   │   ├── CheckInActivity       ← Check-in + QR Code (Firestore update)
-│       │   │   ├── MedicalRecordsActivity← Hồ sơ y tế (Firestore query)
-│       │   │   ├── NotificationsActivity ← Thông báo (Firestore batch update)
-│       │   │   ├── InsuranceActivity     ← Bảo hiểm (Firestore)
-│       │   │   └── ProfileActivity       ← Hồ sơ + Firebase Auth signOut
-│       │   ├── adapter/                  ← 5 RecyclerView Adapters
-│       │   └── model/                    ← 7 POJO Model classes (Firestore @DocumentId)
-│       └── res/
-│           ├── layout/                   ← 24 XML layouts
-│           ├── drawable/                 ← 35 drawable XMLs
-│           ├── menu/bottom_nav_menu.xml  ← Bottom Navigation (5 tabs)
-│           ├── mipmap-*/                 ← App launcher icons
-│           └── values/                   ← colors.xml, themes.xml, strings.xml
-│
-├── firebase-seed/                        ← Script seed data lên Firestore
-│   ├── package.json                      ← Dependency: firebase-admin
-│   ├── seed-firestore.js                 ← Script Node.js seed data
-│   └── serviceAccountKey.json            ← ⚠️ BẠN CẦN TẢI FILE NÀY (xem hướng dẫn)
-│
-└── README.md                             ← File này
+|-- android/                         Android native app
+|   |-- build.gradle                 Root Gradle config, AGP 8.2.2
+|   |-- settings.gradle              Project name: HealthcareApp
+|   |-- gradlew / gradlew.bat        Gradle Wrapper
+|   `-- app/
+|       |-- build.gradle             App config, SDK 34, Firebase, Glide, ZXing
+|       |-- google-services.json     Firebase config đang dùng để chạy app
+|       |-- google-services.json.example
+|       `-- src/main/
+|           |-- AndroidManifest.xml
+|           |-- java/com/healthcare/app/
+|           |   |-- activity/        27 Activity
+|           |   |-- adapter/         6 RecyclerView adapter
+|           |   |-- model/           8 model class
+|           |   |-- receiver/        ReminderReceiver
+|           |   `-- util/            ReceiptGenerator, ReminderScheduler
+|           `-- res/
+|               |-- layout/          32 XML layout/item/dialog
+|               |-- drawable/
+|               |-- menu/
+|               |-- values/
+|               `-- xml/
+|-- firebase-seed/                   Công cụ seed dữ liệu Firestore
+|   |-- seed-data.html               Seed bằng trình duyệt
+|   |-- seed-data.html.example
+|   |-- seed-firestore.js            Seed bằng Node.js/firebase-admin
+|   `-- package.json
+|-- How_To_Run.md                    Hướng dẫn chạy chi tiết
+|-- USE_CASES.md                     Use case nghiệp vụ
+|-- implementation_plan.md           Kế hoạch triển khai
+`-- README.md
 ```
 
----
+## Tech stack
 
-## Yêu cầu cài đặt
+| Nhóm | Công nghệ |
+| --- | --- |
+| Android | Java 17, Android SDK 34, minSdk 24, targetSdk 34 |
+| UI | XML layout, ViewBinding, Material Components, AndroidX, RecyclerView, ViewPager2 |
+| Auth | Firebase Authentication, Email/Password, Google Sign-In |
+| Database | Cloud Firestore |
+| Storage | Firebase Storage |
+| Image loading | Glide 4.16 |
+| QR | ZXing Android Embedded 4.3 |
+| PDF/Reminder | `PdfDocument`, `AlarmManager`, `BroadcastReceiver` |
+| Build | Gradle Wrapper, Android Gradle Plugin 8.2.2, Google Services plugin 4.4.0 |
 
-| # | Phần mềm | Phiên bản | Mục đích | Link tải |
-|---|----------|-----------|----------|----------|
-| 1 | **Java JDK** | 17+ | Build Android app | [Adoptium](https://adoptium.net/) |
-| 2 | **Android Studio** | Latest | IDE phát triển Android | [Android Studio](https://developer.android.com/studio) |
-| 3 | **Node.js** | 18+ | Chạy script seed data | [Node.js](https://nodejs.org/) |
-| 4 | **Tài khoản Google** | — | Tạo Firebase project | [Firebase Console](https://console.firebase.google.com/) |
+## Màn hình chính
 
-> **KHÔNG CẦN**: Docker, Oracle, Maven, Spring Boot — Firebase thay thế tất cả backend!
+| Màn hình | Activity |
+| --- | --- |
+| Onboarding | `OnboardingActivity` |
+| Login / Register / Forgot / Reset Password | `LoginActivity`, `RegisterActivity`, `ForgotPasswordActivity`, `ResetPasswordActivity` |
+| Home | `HomeActivity` |
+| Search | `SearchActivity` |
+| Doctor / Hospital Detail | `DoctorDetailActivity`, `HospitalDetailActivity` |
+| Booking / Payment / Confirmation | `BookingActivity`, `PaymentActivity`, `ConfirmationActivity` |
+| Appointments / Check-in / Reschedule / Review | `AppointmentsActivity`, `CheckInActivity`, `RescheduleActivity`, `ReviewActivity` |
+| Medical Records / Record Detail | `MedicalRecordsActivity`, `RecordDetailActivity` |
+| Notifications | `NotificationsActivity` |
+| Insurance | `InsuranceActivity` |
+| Profile | `ProfileActivity` |
+| Family Members | `FamilyMembersActivity` |
+| Payment Methods | `PaymentMethodsActivity` |
+| App Settings | `AppSettingsActivity` |
+| Support | `SupportActivity` |
+| Admin Dashboard / Staff Scan | `AdminDashboardActivity`, `StaffScanActivity` |
 
----
+Một vài màn hình như `PaymentMethodsActivity`, `AppSettingsActivity`, `SupportActivity`, `AdminDashboardActivity` và `ReviewActivity` đang dựng UI bằng Java code thay vì XML layout riêng.
 
-## Hướng dẫn cài đặt & chạy
+## Firestore collections đang dùng
 
-### Thứ tự thực hiện
+| Collection | Mục đích |
+| --- | --- |
+| `users` | Hồ sơ người dùng, avatar, thông tin liên hệ |
+| `users/{uid}/login_history` | Lịch sử đăng nhập theo thiết bị |
+| `hospitals` | Danh sách bệnh viện |
+| `doctors` | Danh sách bác sĩ |
+| `appointments` | Lịch hẹn, trạng thái, QR/check-in, review flag |
+| `payments` | Giao dịch thanh toán |
+| `medical_records` | Hồ sơ y tế |
+| `notifications` | Thông báo trong app |
+| `insurance` | Thông tin bảo hiểm |
+| `family_members` | Người thân của user |
+| `payment_methods` | Phương thức thanh toán đã lưu |
+| `user_settings` | Cài đặt notification/email/dark mode |
+| `reviews` | Đánh giá bác sĩ sau lịch hẹn |
+| `support_tickets` | Ticket hỗ trợ khách hàng |
+| `vouchers` | Voucher do admin tạo |
+| `content_banners` | Banner/content do admin tạo |
 
-```
-Bước 1           Bước 2              Bước 3           Bước 4            Bước 5
-Tạo Firebase → Tải google-       → Seed data     → Tạo user       → Chạy app
-Project         services.json       lên Firestore    trong Auth       trên emulator
-(5 phút)        (2 phút)            (2 phút)         (2 phút)         (3 phút)
-```
+## Luồng đặt lịch
 
----
-
-### Bước 1: Tạo Firebase Project
-
-1. Vào **https://console.firebase.google.com/**
-2. Đăng nhập bằng **tài khoản Google**
-3. Click **"Create a project"**
-4. Đặt tên: `healthcare-app` → **Continue**
-5. Tắt Google Analytics → **Create project** → **Continue**
-
-**Bật Authentication:**
-1. Menu trái → **Build → Authentication** → **Get started**
-2. Tab **Sign-in method** → Bật **Email/Password** → **Save**
-
-**Tạo Firestore Database:**
-1. Menu trái → **Build → Firestore Database** → **Create database**
-2. Chọn **Start in test mode** → **Next**
-3. Chọn location **asia-southeast1** (Singapore) → **Enable**
-
----
-
-### Bước 2: Tải google-services.json
-
-1. Trong Firebase Console → **Project Settings** (biểu tượng bánh răng)
-2. Cuộn xuống phần **Your apps** → Click icon **Android**
-3. Nhập package name: `com.healthcare.app` → **Register app**
-4. Click **Download google-services.json**
-5. Copy file vào:
-   ```
-   android/app/google-services.json
-   ```
-6. Click **Next** → **Next** → **Continue to console**
-
----
-
-### Bước 3: Seed data lên Firestore
-
-**3a. Tải Service Account Key:**
-1. Firebase Console → **Project Settings → Service accounts**
-2. Click **Generate new private key** → **Generate key**
-3. Lưu file thành:
-   ```
-   firebase-seed/serviceAccountKey.json
-   ```
-
-**3b. Chạy script seed:**
-```bash
-cd firebase-seed
-npm install
-node seed-firestore.js
-```
-
-Kết quả:
-```
-Seeding Firestore data...
-Adding hospitals...
-  ✓ 4 hospitals added
-Adding doctors...
-  ✓ 5 doctors added
+```text
+Search/Home
+   -> DoctorDetailActivity
+   -> BookingActivity
+      - chọn dịch vụ
+      - chọn ngày/giờ
+      - chọn bệnh nhân hoặc người thân
+      - nhập triệu chứng
+   -> PaymentActivity
+      - chọn phương thức thanh toán
+      - ghi payments + appointments bằng WriteBatch
+      - tạo notification
+      - lên lịch reminder trước 1 giờ
+   -> ConfirmationActivity
+      - hiển thị thông tin xác nhận
+      - mở Appointments hoặc tạo hóa đơn PDF
 ```
 
----
+## Chạy dự án
 
-### Bước 4: Tạo user test trong Firebase Auth
+Yêu cầu:
 
-1. Firebase Console → **Authentication → Users**
-2. Click **Add user**
-3. Nhập:
-   - **Email**: `sarah.williams@email.com`
-   - **Password**: `password123`
-4. Click **Add user**
-5. **Copy UID** của user vừa tạo (cột User UID)
-6. Mở file `firebase-seed/seed-firestore.js`
-7. Thay `REPLACE_WITH_ACTUAL_UID` bằng UID thực
-8. Chạy lại:
-   ```bash
-   node seed-firestore.js
-   ```
-   Lần này sẽ thêm appointments, records, notifications, insurance.
+- Android Studio
+- JDK 17
+- Firebase project có Authentication, Cloud Firestore và Storage
+- File `android/app/google-services.json`
 
----
+Chạy bằng Android Studio:
 
-### Bước 5: Chạy app Android
+1. Mở thư mục `android/`.
+2. Sync Gradle.
+3. Kiểm tra `android/app/google-services.json`.
+4. Chạy app trên emulator hoặc thiết bị thật.
 
-1. Mở **Android Studio**
-2. **File → Open** → chọn thư mục `android/`
-3. Đợi **Gradle Sync** hoàn tất
-4. Tạo emulator: **Tools → Device Manager → Create Virtual Device → Pixel 6 → API 34**
-5. Nhấn **Run ▶** (Shift + F10)
-6. Đăng nhập: `sarah.williams@email.com` / `password123`
+Chạy bằng Gradle:
 
----
-
-## Tài khoản mặc định
-
-| Thông tin | Giá trị |
-|-----------|---------|
-| **Email** | `sarah.williams@email.com` |
-| **Password** | `password123` |
-| **Patient ID** | `PT-123456` |
-
----
-
-## Cấu trúc Firestore Database
-
-```
-📁 Firestore Database
-│
-├── 📁 users (collection)
-│   └── 📄 {uid} → { name, email, phone, address, patientId, uid }
-│
-├── 📁 hospitals (collection)
-│   ├── 📄 hospital_1 → { name, image, rating, reviewCount, specialties, distance, ... }
-│   ├── 📄 hospital_2
-│   └── ...
-│
-├── 📁 doctors (collection)
-│   ├── 📄 doctor_1 → { name, specialization, hospitalId, hospitalName, rating, consultationFee, ... }
-│   ├── 📄 doctor_2
-│   └── ...
-│
-├── 📁 appointments (collection)
-│   └── 📄 auto-id → { appointmentId, userId, doctorId, doctorName, hospital, date, time, status, ... }
-│
-├── 📁 medical_records (collection)
-│   └── 📄 auto-id → { recordId, userId, date, type, title, doctor, hospital, details }
-│
-├── 📁 notifications (collection)
-│   └── 📄 auto-id → { notificationId, userId, type, title, message, time, isRead }
-│
-├── 📁 insurance (collection)
-│   └── 📄 auto-id → { userId, provider, policyNumber, coverage, validUntil, status }
-│
-└── 📁 payments (collection)
-    └── 📄 auto-id → { userId, doctorId, amount, paymentMethod, status, paymentId }
+```powershell
+cd android
+.\gradlew.bat assembleDebug
 ```
 
----
+APK debug sau khi build nằm tại:
 
-## Màn hình ứng dụng
+```text
+android/app/build/outputs/apk/debug/app-debug.apk
+```
 
-| # | Màn hình | Activity | Firebase Service |
-|---|----------|----------|-----------------|
-| 1 | Onboarding | `OnboardingActivity` | — |
-| 2 | Login | `LoginActivity` | Auth: `signInWithEmailAndPassword` |
-| 3 | Register | `RegisterActivity` | Auth: `createUserWithEmailAndPassword` + Firestore |
-| 4 | Forgot Password | `ForgotPasswordActivity` | Auth: `sendPasswordResetEmail` |
-| 5 | Reset Password | `ResetPasswordActivity` | Auth: `updatePassword` |
-| 6 | Home | `HomeActivity` | Firestore: `doctors`, `hospitals` |
-| 7 | Search | `SearchActivity` | Firestore: `doctors`, `hospitals` + local filter |
-| 8 | Doctor Detail | `DoctorDetailActivity` | Firestore: `doctors/{id}` |
-| 9 | Hospital Detail | `HospitalDetailActivity` | Firestore: `hospitals/{id}` + `doctors` query |
-| 10 | Booking | `BookingActivity` | Firestore: `doctors/{id}` |
-| 11 | Payment | `PaymentActivity` | Firestore: `payments.add()` |
-| 12 | Confirmation | `ConfirmationActivity` | Firestore: `doctors/{id}` |
-| 13 | Appointments | `AppointmentsActivity` | Firestore: `appointments` query by userId + status |
-| 14 | Check-In | `CheckInActivity` | Firestore: `appointments` update queueStatus |
-| 15 | Medical Records | `MedicalRecordsActivity` | Firestore: `medical_records` query by userId + type |
-| 16 | Notifications | `NotificationsActivity` | Firestore: `notifications` + WriteBatch markAllRead |
-| 17 | Insurance | `InsuranceActivity` | Firestore: `insurance` query by userId |
-| 18 | Profile | `ProfileActivity` | Firestore: `users/{uid}` + Auth: `signOut` |
+## Seed dữ liệu demo
 
----
+Thư mục `firebase-seed/` có 2 cách seed:
 
-## Tech Stack
+- `seed-data.html`: mở bằng trình duyệt, nhập Firebase config/UID rồi seed trực tiếp.
+- `seed-firestore.js`: dùng Node.js với `firebase-admin`.
 
-| Layer | Công nghệ |
-|-------|-----------|
-| **Android** | Java 17, Android SDK 34, Material Design 3, ViewBinding |
-| **Auth** | Firebase Authentication (Email/Password) |
-| **Database** | Cloud Firestore (NoSQL) |
-| **Images** | Glide 4.16 |
-| **QR Code** | ZXing 4.3 |
-| **Build** | Gradle 8.5, AGP 8.2.2 |
+Dữ liệu seed hiện bao gồm:
 
----
+- 5 bệnh viện
+- 5 bác sĩ
+- 1 user demo nếu điền UID thật
+- 4 lịch hẹn
+- 4 hồ sơ y tế
+- 5 thông báo
+- 1 bảo hiểm
 
-## Xử lý sự cố thường gặp
+Tài khoản demo được ghi trong script seed:
 
-| Vấn đề | Giải pháp |
-|--------|-----------|
-| `google-services.json not found` | Tải file từ Firebase Console và đặt vào `android/app/` |
-| Gradle sync lỗi | Đảm bảo có internet, Android Studio tự tải dependencies |
-| Login thất bại | Kiểm tra đã tạo user trong Firebase Auth chưa |
-| Không hiện data | Kiểm tra đã chạy seed script và Firestore rules là test mode |
-| Build lỗi SDK | Click **Install missing SDK** khi Android Studio hiện link |
-| `FirebaseApp is not initialized` | Đảm bảo `google-services.json` đúng vị trí và Gradle sync OK |
+```text
+Email: sarah.williams@email.com
+Password: password123
+```
+
+Lưu ý: cần tạo user này trong Firebase Authentication trước, sau đó dùng UID thật để seed các collection gắn với user.
+
+## Cấu hình cần chú ý
+
+- `android/app/google-services.json` đang được app dùng để kết nối Firebase. File `.example` chỉ là mẫu.
+- Google Sign-In cần cấu hình `default_web_client_id` trong `android/app/src/main/res/values/strings.xml`; hiện đang để placeholder `YOUR_WEB_CLIENT_ID_HERE`.
+- Các quyền đã khai báo: Internet, network state, camera, exact alarm và post notifications.
+- App có sẵn `FileProvider` để mở hóa đơn PDF/tệp nội bộ.
+- Một số dữ liệu ngày trong seed đang là dữ liệu demo, không tự cập nhật theo ngày hiện tại.
+
+## Ghi chú về phần web/package root
+
+Ở root có `package.json` theo dạng Vite/React prototype từ công cụ thiết kế, nhưng source app đang được triển khai chính trong `android/`. README này mô tả phần Android native đã xây dựng hiện tại.
