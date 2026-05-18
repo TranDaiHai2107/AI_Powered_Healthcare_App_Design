@@ -154,21 +154,51 @@ Search/Home
 
 ## Chạy dự án
 
-Yêu cầu:
+### Yêu cầu
 
 - Android Studio
-- JDK 17
+- JDK 17 trở lên
+- Android SDK 34
 - Firebase project có Authentication, Cloud Firestore và Storage
 - File `android/app/google-services.json`
 
-Chạy bằng Android Studio:
+Kiểm tra Java:
 
-1. Mở thư mục `android/`.
-2. Sync Gradle.
-3. Kiểm tra `android/app/google-services.json`.
-4. Chạy app trên emulator hoặc thiết bị thật.
+```powershell
+java -version
+```
 
-Chạy bằng Gradle:
+### Cách 1: chạy bằng Android Studio
+
+1. Mở **Android Studio**.
+2. Chọn **File > Open**.
+3. Chọn thư mục:
+
+```text
+AI-Powered Healthcare App Design/android
+```
+
+4. Đợi **Gradle Sync** hoàn tất.
+5. Kiểm tra file Firebase config đã nằm đúng vị trí:
+
+```text
+android/app/google-services.json
+```
+
+6. Chọn emulator hoặc thiết bị thật.
+7. Nhấn **Run** hoặc dùng phím tắt **Shift + F10**.
+
+Nếu chưa có emulator:
+
+1. Vào **Tools > Device Manager**.
+2. Chọn **Create Virtual Device**.
+3. Chọn thiết bị, ví dụ Pixel 6.
+4. Chọn system image Android API 34.
+5. Tạo emulator rồi chạy app.
+
+### Cách 2: build APK bằng Gradle
+
+Trên Windows PowerShell:
 
 ```powershell
 cd android
@@ -180,6 +210,58 @@ APK debug sau khi build nằm tại:
 ```text
 android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+### Cách 3: cài APK vào thiết bị/emulator bằng adb
+
+Sau khi đã build APK:
+
+```powershell
+cd android
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+Nếu máy không nhận `adb`, mở terminal trong Android Studio hoặc thêm Android SDK `platform-tools` vào PATH.
+
+### Đăng nhập demo
+
+```text
+Email: sarah.williams@email.com
+Password: password123
+```
+
+Tài khoản này chỉ dùng được khi đã tạo user tương ứng trong Firebase Authentication và seed dữ liệu theo UID thật của user.
+
+### Seed dữ liệu trước khi chạy thử đầy đủ
+
+App vẫn có thể mở nếu chưa seed, nhưng các màn hình như Home, Search, Appointments, Medical Records, Notifications và Insurance cần dữ liệu Firestore để hiển thị đầy đủ.
+
+Các bước nhanh:
+
+1. Tạo hoặc kiểm tra user demo trong Firebase Authentication.
+2. Lấy UID của user demo.
+3. Mở `firebase-seed/seed-data.html` bằng trình duyệt.
+4. Nhập Firebase config và UID.
+5. Chạy seed để tạo hospitals, doctors, appointments, medical records, notifications và insurance.
+
+Có thể dùng script Node.js thay thế:
+
+```powershell
+cd firebase-seed
+npm install
+node seed-firestore.js
+```
+
+Với cách Node.js, cần sửa `USER_UID` trong `seed-firestore.js` thành UID thật trước khi chạy.
+
+### Lỗi thường gặp
+
+| Lỗi | Cách xử lý |
+| --- | --- |
+| Gradle Sync failed | Mở đúng thư mục `android/`, kiểm tra JDK 17 và kết nối internet để tải dependencies |
+| `google-services.json` missing | Đặt file Firebase config vào `android/app/google-services.json` |
+| Không đăng nhập Google được | Cập nhật `default_web_client_id` trong `android/app/src/main/res/values/strings.xml` |
+| App đăng nhập được nhưng không có dữ liệu | Seed Firestore bằng UID thật của user đang đăng nhập |
+| Không nhận emulator/thiết bị | Kiểm tra Device Manager, bật USB debugging nếu dùng máy thật |
 
 ## Seed dữ liệu demo
 
