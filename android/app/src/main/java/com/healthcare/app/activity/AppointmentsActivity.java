@@ -100,6 +100,15 @@ public class AppointmentsActivity extends AppCompatActivity {
                     Toast.makeText(AppointmentsActivity.this, "Failed to generate receipt", Toast.LENGTH_SHORT).show();
                 }
             }
+
+            @Override
+            public void onReview(Appointment appointment) {
+                Intent intent = new Intent(AppointmentsActivity.this, ReviewActivity.class);
+                intent.putExtra("appointmentId", appointment.getAppointmentId());
+                intent.putExtra("doctorId", appointment.getDoctorId());
+                intent.putExtra("doctorName", appointment.getDoctorName());
+                startActivity(intent);
+            }
         });
         binding.rvAppointments.setLayoutManager(new LinearLayoutManager(this));
         binding.rvAppointments.setAdapter(adapter);
