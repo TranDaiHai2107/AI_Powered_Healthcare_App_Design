@@ -1,6 +1,7 @@
 package com.healthcare.app.model;
 
 import com.google.firebase.firestore.DocumentId;
+import java.util.List;
 
 public class MedicalRecord {
     @DocumentId
@@ -14,6 +15,10 @@ public class MedicalRecord {
     private String hospital;
     private String details;
     private String attachments;
+    private String appointmentId;
+    private String diagnosis;
+    private String prescription;
+    private List<String> attachmentUrls;
 
     public MedicalRecord() {}
 
@@ -37,4 +42,12 @@ public class MedicalRecord {
     public void setDetails(String details) { this.details = details; }
     public String getAttachments() { return attachments; }
     public void setAttachments(String attachments) { this.attachments = attachments; }
+    public String getAppointmentId() { return appointmentId; }
+    public void setAppointmentId(String appointmentId) { this.appointmentId = appointmentId; }
+    public String getDiagnosis() { return diagnosis; }
+    public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
+    public String getPrescription() { return prescription; }
+    public void setPrescription(String prescription) { this.prescription = prescription; }
+    public List<String> getAttachmentUrls() { return attachmentUrls; }
+    public void setAttachmentUrls(List<String> attachmentUrls) { this.attachmentUrls = attachmentUrls; }
 }
