@@ -13,8 +13,10 @@ import com.healthcare.app.R;
 import com.healthcare.app.databinding.ItemRecordBinding;
 import com.healthcare.app.model.MedicalRecord;
 
+import android.content.Intent;
 import java.util.ArrayList;
 import java.util.List;
+import com.healthcare.app.activity.RecordDetailActivity;
 
 public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordViewHolder> {
 
@@ -67,6 +69,12 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.RecordView
 
             String type = record.getType() != null ? record.getType() : "";
             applyTypeStyle(type);
+
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, RecordDetailActivity.class);
+                intent.putExtra("recordId", record.getDocumentId());
+                context.startActivity(intent);
+            });
         }
 
         private void applyTypeStyle(String type) {
