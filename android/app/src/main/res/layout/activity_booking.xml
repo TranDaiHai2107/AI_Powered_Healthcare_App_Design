@@ -319,6 +319,30 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Patient Selection -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Booking For"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerPatient"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_edit_text"
+                    android:paddingHorizontal="16dp" />
+            </LinearLayout>
+
             <!-- Step 1: Select Service Type -->
             <LinearLayout
                 android:id="@+id/layoutStep1"
