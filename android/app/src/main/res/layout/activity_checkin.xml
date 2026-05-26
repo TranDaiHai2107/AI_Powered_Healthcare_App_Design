@@ -90,11 +90,20 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Scan QR Code"
+                    android:text="Show QR Code to Reception"
                     android:textColor="@color/healthcare_dark"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Waiting for reception to confirm..."
+                    android:textColor="@color/healthcare_muted"
+                    android:textSize="11sp" />
+
+                <!-- QR Code image -->
                 <ImageView
                     android:id="@+id/imgQrCode"
                     android:layout_width="200dp"
@@ -103,13 +112,68 @@
                     android:scaleType="fitCenter"
                     tools:src="@android:drawable/ic_menu_gallery" />
 
+                <!-- Success overlay — visible when check-in confirmed -->
                 <TextView
+                    android:id="@+id/tvCheckinSuccess"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="Show this to the reception"
+                    android:background="@color/pastel_mint_20"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="8dp"
+                    android:text="✅ Check-in Confirmed!"
+                    android:textColor="@color/pastel_mint_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <!-- Waiting instruction — visible before check-in -->
+                <LinearLayout
+                    android:id="@+id/tvWaitingInstruction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <ProgressBar
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:indeterminate="true" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Waiting for staff to scan..."
+                        android:textColor="@color/pastel_blue_dark"
+                        android:textSize="13sp"
+                        android:textStyle="italic" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Show this QR to the reception desk"
                     android:textColor="@color/healthcare_muted"
                     android:textSize="12sp" />
+
+                <!-- Scan button: patient scans hospital QR to confirm check-in (Hidden in new flow) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnScanToCheckin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="16dp"
+                    android:text="📷  Scan to Check In"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:visibility="gone"
+                    app:backgroundTint="@color/pastel_blue"
+                    app:cornerRadius="12dp" />
 
             </LinearLayout>
 
