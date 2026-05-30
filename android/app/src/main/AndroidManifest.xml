@@ -50,6 +50,11 @@
         <activity android:name=".activity.MedicalRecordsActivity" />
         <activity android:name=".activity.NotificationsActivity" />
         <activity android:name=".activity.InsuranceActivity" />
+        <activity android:name=".activity.PaymentMethodsActivity" />
+        <activity android:name=".activity.AppSettingsActivity" />
+        <activity android:name=".activity.SupportActivity" />
+        <activity android:name=".activity.AdminDashboardActivity" />
+        <activity android:name=".activity.ReviewActivity" />
         <activity android:name=".activity.ProfileActivity" />
         <activity android:name=".activity.RescheduleActivity" />
         <activity android:name=".activity.RecordDetailActivity" />

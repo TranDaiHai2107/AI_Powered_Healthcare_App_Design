@@ -20,8 +20,14 @@ import com.healthcare.app.databinding.ActivityBookingBinding;
 import com.healthcare.app.model.Doctor;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
+import android.widget.ArrayAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.healthcare.app.model.FamilyMember;
 
 public class BookingActivity extends AppCompatActivity {
 
@@ -44,6 +50,10 @@ public class BookingActivity extends AppCompatActivity {
     private View lastSelectedDateView = null;
     private MaterialButton lastSelectedTimeBtn = null;
 
+    private List<FamilyMember> familyMembers = new ArrayList<>();
+    private String selectedPatientName = "Self";
+    private String selectedFamilyMemberId = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +68,7 @@ public class BookingActivity extends AppCompatActivity {
         setupServiceButtons();
         setupDateButtons();
         loadDoctor();
+        loadFamilyMembers();
     }
 
     private void initStepViews() {
@@ -170,6 +181,29 @@ public class BookingActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load doctor details", Toast.LENGTH_SHORT).show());
     }
 
+    private void loadFamilyMembers() {
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (uid == null) return;
+
+        db.collection("family_members").whereEqualTo("userId", uid).get()
+                .addOnSuccessListener(querySnapshot -> {
+                    familyMembers.clear();
+                    List<String> patientNames = new ArrayList<>();
+                    patientNames.add("Self"); // Default option
+
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        FamilyMember member = doc.toObject(FamilyMember.class);
+                        familyMembers.add(member);
+                        patientNames.add(member.getName() + " (" + member.getRelationship() + ")");
+                    }
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                            android.R.layout.simple_spinner_item, patientNames);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    binding.spinnerPatient.setAdapter(adapter);
+                });
+    }
+
     private void populateUI(Doctor doctor) {
         binding.tvDoctorName.setText(doctor.getName()); binding.tvSpecialization.setText(doctor.getSpecialization());
         if (doctor.getConsultationFee() != null) binding.tvFee.setText(String.format(Locale.US, "$%.0f", doctor.getConsultationFee()));
@@ -210,8 +244,31 @@ public class BookingActivity extends AppCompatActivity {
 
     private void navigateToPayment() {
         if (currentDoctor == null) return;
+
+        int selectedPatientPos = binding.spinnerPatient.getSelectedItemPosition();
+        if (selectedPatientPos > 0 && selectedPatientPos <= familyMembers.size()) {
+            FamilyMember selectedMember = familyMembers.get(selectedPatientPos - 1);
+            selectedPatientName = selectedMember.getName();
+            selectedFamilyMemberId = selectedMember.getDocumentId();
+        } else {
+            selectedPatientName = "Self";
+            selectedFamilyMemberId = null;
+        }
+
+        String symptoms = binding.etSymptoms.getText() != null ? binding.etSymptoms.getText().toString().trim() : "";
+
         Intent intent = new Intent(this, PaymentActivity.class);
         intent.putExtra("doctorId", currentDoctor.getDocumentId());
+        intent.putExtra("selectedService", selectedService);
+        intent.putExtra("selectedDate", selectedDate);
+        intent.putExtra("selectedTime", selectedTime);
+        intent.putExtra("doctorName", currentDoctor.getName());
+        intent.putExtra("doctorSpecialization", currentDoctor.getSpecialization());
+        intent.putExtra("doctorImage", currentDoctor.getImage());
+        intent.putExtra("hospitalName", currentDoctor.getHospitalName());
+        intent.putExtra("patientName", selectedPatientName);
+        intent.putExtra("familyMemberId", selectedFamilyMemberId);
+        intent.putExtra("symptoms", symptoms);
         startActivity(intent);
     }
 

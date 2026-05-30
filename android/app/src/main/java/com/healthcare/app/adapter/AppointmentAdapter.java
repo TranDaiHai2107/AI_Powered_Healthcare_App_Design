@@ -27,6 +27,10 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
     public interface OnAppointmentClickListener {
         void onCheckIn(String appointmentId);
         void onViewRecords();
+        void onCancel(String appointmentId, String documentId);
+        void onReschedule(Appointment appointment);
+        void onDownloadReceipt(Appointment appointment);
+        void onReview(Appointment appointment);
     }
 
     public AppointmentAdapter(Context context, List<Appointment> appointments, OnAppointmentClickListener listener) {
@@ -38,12 +42,20 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
     @NonNull
     @Override
     public AppointmentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ItemAppointmentBinding binding = ItemAppointmentBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
+        ItemAppointmentBinding binding = ItemAppointmentBinding.inflate(
+                LayoutInflater.from(parent.getContext()), parent, false);
         return new AppointmentViewHolder(binding);
     }
 
-    @Override public void onBindViewHolder(@NonNull AppointmentViewHolder holder, int position) { holder.bind(appointments.get(position)); }
-    @Override public int getItemCount() { return appointments.size(); }
+    @Override
+    public void onBindViewHolder(@NonNull AppointmentViewHolder holder, int position) {
+        holder.bind(appointments.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return appointments.size();
+    }
 
     public void updateList(List<Appointment> newAppointments) {
         this.appointments = newAppointments != null ? newAppointments : new ArrayList<>();
@@ -52,7 +64,11 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
 
     class AppointmentViewHolder extends RecyclerView.ViewHolder {
         private final ItemAppointmentBinding binding;
-        AppointmentViewHolder(ItemAppointmentBinding binding) { super(binding.getRoot()); this.binding = binding; }
+
+        AppointmentViewHolder(ItemAppointmentBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
 
         void bind(Appointment appointment) {
             String status = appointment.getStatus() != null ? appointment.getStatus() : "";
@@ -61,35 +77,95 @@ public class AppointmentAdapter extends RecyclerView.Adapter<AppointmentAdapter.
             binding.tvDoctorName.setText(appointment.getDoctorName());
             binding.tvSpecialization.setText(appointment.getDoctorSpecialization());
 
-            Glide.with(context).load(appointment.getDoctorImage()).centerCrop()
-                    .placeholder(R.drawable.bg_rounded_image).into(binding.imgDoctor);
+            Glide.with(context)
+                    .load(appointment.getDoctorImage())
+                    .centerCrop()
+                    .placeholder(R.drawable.bg_rounded_image)
+                    .into(binding.imgDoctor);
 
             binding.tvHospital.setText(appointment.getHospital());
             binding.tvDate.setText(appointment.getDate());
             binding.tvTime.setText(appointment.getTime());
 
+            // Show/hide action buttons based on status
             switch (status.toLowerCase()) {
                 case "upcoming":
-                    binding.btnCheckIn.setVisibility(View.VISIBLE); binding.btnViewRecords.setVisibility(View.GONE); break;
+                    binding.btnCheckIn.setVisibility(View.VISIBLE);
+                    binding.btnViewRecords.setVisibility(View.GONE);
+                    binding.btnDownloadReceipt.setVisibility(View.GONE);
+                    binding.btnCancel.setVisibility(View.VISIBLE);
+                    binding.btnReschedule.setVisibility(View.VISIBLE);
+                    binding.btnReview.setVisibility(View.GONE);
+                    binding.layoutActions.setVisibility(View.VISIBLE);
+                    break;
                 case "completed":
-                    binding.btnCheckIn.setVisibility(View.GONE); binding.btnViewRecords.setVisibility(View.VISIBLE); break;
+                    binding.btnCheckIn.setVisibility(View.GONE);
+                    binding.btnViewRecords.setVisibility(View.VISIBLE);
+                    binding.btnDownloadReceipt.setVisibility(View.VISIBLE);
+                    binding.btnCancel.setVisibility(View.GONE);
+                    binding.btnReschedule.setVisibility(View.GONE);
+                    binding.btnReview.setVisibility(View.VISIBLE);
+                    binding.layoutActions.setVisibility(View.VISIBLE);
+                    break;
                 default:
-                    binding.layoutActions.setVisibility(View.GONE); break;
+                    // cancelled or pending
+                    binding.btnReview.setVisibility(View.GONE);
+                    binding.layoutActions.setVisibility(View.GONE);
+                    break;
             }
 
-            binding.btnCheckIn.setOnClickListener(v -> { if (listener != null) listener.onCheckIn(appointment.getAppointmentId()); });
-            binding.btnViewRecords.setOnClickListener(v -> { if (listener != null) listener.onViewRecords(); });
+            binding.btnCheckIn.setOnClickListener(v -> {
+                if (listener != null) listener.onCheckIn(appointment.getAppointmentId());
+            });
+            binding.btnViewRecords.setOnClickListener(v -> {
+                if (listener != null) listener.onViewRecords();
+            });
+            binding.btnCancel.setOnClickListener(v -> {
+                if (listener != null)
+                    listener.onCancel(appointment.getAppointmentId(), appointment.getDocumentId());
+            });
+            binding.btnReschedule.setOnClickListener(v -> {
+                if (listener != null) listener.onReschedule(appointment);
+            });
+            binding.btnDownloadReceipt.setOnClickListener(v -> {
+                if (listener != null) listener.onDownloadReceipt(appointment);
+            });
+            binding.btnReview.setOnClickListener(v -> {
+                if (listener != null) listener.onReview(appointment);
+            });
         }
 
         private void applyStatusBadge(String status) {
-            int bgColor, textColor; String label;
+            int bgColor, textColor;
+            String label;
             switch (status.toLowerCase()) {
-                case "completed": bgColor = ContextCompat.getColor(context, R.color.pastel_mint_20); textColor = ContextCompat.getColor(context, R.color.pastel_mint_dark); label = "Completed"; break;
-                case "cancelled": bgColor = ContextCompat.getColor(context, R.color.red_100); textColor = ContextCompat.getColor(context, R.color.red_700); label = "Cancelled"; break;
-                default: bgColor = ContextCompat.getColor(context, R.color.pastel_blue_20); textColor = ContextCompat.getColor(context, R.color.pastel_blue_dark); label = "Upcoming"; break;
+                case "completed":
+                    bgColor = ContextCompat.getColor(context, R.color.pastel_mint_20);
+                    textColor = ContextCompat.getColor(context, R.color.pastel_mint_dark);
+                    label = "Completed";
+                    break;
+                case "cancelled":
+                    bgColor = ContextCompat.getColor(context, R.color.red_100);
+                    textColor = ContextCompat.getColor(context, R.color.red_700);
+                    label = "Cancelled";
+                    break;
+                case "pending_payment":
+                    bgColor = ContextCompat.getColor(context, R.color.pastel_lavender);
+                    textColor = ContextCompat.getColor(context, R.color.healthcare_dark);
+                    label = "Pending Payment";
+                    break;
+                default:
+                    bgColor = ContextCompat.getColor(context, R.color.pastel_blue_20);
+                    textColor = ContextCompat.getColor(context, R.color.pastel_blue_dark);
+                    label = "Upcoming";
+                    break;
             }
-            binding.tvStatus.setText(label); binding.tvStatus.setTextColor(textColor);
-            GradientDrawable badge = new GradientDrawable(); badge.setShape(GradientDrawable.RECTANGLE); badge.setCornerRadius(20f); badge.setColor(bgColor);
+            binding.tvStatus.setText(label);
+            binding.tvStatus.setTextColor(textColor);
+            GradientDrawable badge = new GradientDrawable();
+            badge.setShape(GradientDrawable.RECTANGLE);
+            badge.setCornerRadius(20f);
+            badge.setColor(bgColor);
             binding.tvStatus.setBackground(badge);
         }
     }

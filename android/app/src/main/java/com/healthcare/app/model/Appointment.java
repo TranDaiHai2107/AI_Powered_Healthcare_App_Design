@@ -1,6 +1,9 @@
 package com.healthcare.app.model;
 
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.ServerTimestamp;
+
+import java.util.Date;
 
 public class Appointment {
     @DocumentId
@@ -17,9 +20,16 @@ public class Appointment {
     private String status;
     private String type;
     private String symptoms;
+    private String patientName;
+    private String familyMemberId;
     private String qrCode;
     private Integer queueNumber;
     private String queueStatus;
+    private String paymentId;
+    private Double consultationFee;
+    @ServerTimestamp
+    private Date createdAt;
+    private Date checkInTime;
 
     public Appointment() {}
 
@@ -49,10 +59,22 @@ public class Appointment {
     public void setType(String type) { this.type = type; }
     public String getSymptoms() { return symptoms; }
     public void setSymptoms(String symptoms) { this.symptoms = symptoms; }
+    public String getPatientName() { return patientName; }
+    public void setPatientName(String patientName) { this.patientName = patientName; }
+    public String getFamilyMemberId() { return familyMemberId; }
+    public void setFamilyMemberId(String familyMemberId) { this.familyMemberId = familyMemberId; }
     public String getQrCode() { return qrCode; }
     public void setQrCode(String qrCode) { this.qrCode = qrCode; }
     public Integer getQueueNumber() { return queueNumber; }
     public void setQueueNumber(Integer queueNumber) { this.queueNumber = queueNumber; }
     public String getQueueStatus() { return queueStatus; }
     public void setQueueStatus(String queueStatus) { this.queueStatus = queueStatus; }
+    public String getPaymentId() { return paymentId; }
+    public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
+    public Double getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(Double consultationFee) { this.consultationFee = consultationFee; }
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public Date getCheckInTime() { return checkInTime; }
+    public void setCheckInTime(Date checkInTime) { this.checkInTime = checkInTime; }
 }
