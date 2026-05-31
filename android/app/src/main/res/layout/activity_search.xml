@@ -22,31 +22,49 @@
         <!-- Search Input -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/bg_rounded_input"
-            android:gravity="center_vertical"
+            android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
+            android:gravity="center_vertical">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_search"
-                app:tint="@color/healthcare_muted" />
-
-            <EditText
-                android:id="@+id/etSearch"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="50dp"
                 android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:background="@null"
-                android:hint="@string/search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textColor="@color/healthcare_dark"
-                android:textColorHint="@color/healthcare_muted"
-                android:textSize="14sp" />
+                android:background="@drawable/bg_rounded_input"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="@color/healthcare_muted" />
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:background="@null"
+                    android:hint="@string/search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:textColor="@color/healthcare_dark"
+                    android:textColorHint="@color/healthcare_muted"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnFilter"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_rounded_card"
+                android:src="@android:drawable/ic_menu_sort_by_size"
+                app:tint="@color/pastel_blue_dark" />
 
         </LinearLayout>
 

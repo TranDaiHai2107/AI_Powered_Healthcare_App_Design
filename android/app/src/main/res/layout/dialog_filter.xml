@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Filter &amp; Sort"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="@color/healthcare_muted" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="16dp"
+        android:background="@color/border_color" />
+
+    <!-- Sort By -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sort By"
+        android:textColor="@color/healthcare_dark"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/rgSort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbSortRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="Highest Rating"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/rbSortPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lowest Price" />
+    </RadioGroup>
+
+    <!-- Specialty -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Specialty"
+        android:textColor="@color/healthcare_dark"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerSpecialty"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_edit_text"
+        android:paddingHorizontal="16dp" />
+
+    <!-- Max Price -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Max Consultation Fee"
+        android:textColor="@color/healthcare_dark"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$0"
+            android:textColor="@color/healthcare_muted" />
+
+        <SeekBar
+            android:id="@+id/seekBarPrice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:max="500"
+            android:progress="200" />
+
+        <TextView
+            android:id="@+id/tvPriceValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$200"
+            android:textColor="@color/pastel_blue_dark"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnReset"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:text="Reset"
+            android:textAllCaps="false" />
+
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/pastel_blue"
+            android:text="Apply Filter"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+</LinearLayout>

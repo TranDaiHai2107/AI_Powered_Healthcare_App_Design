@@ -110,6 +110,53 @@
             android:text="@string/sign_in"
             android:textSize="16sp" />
 
+        <!-- OR divider -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/border_color" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="12dp"
+                android:text="OR"
+                android:textColor="@color/healthcare_muted"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1"
+                android:background="@color/border_color" />
+        </LinearLayout>
+
+        <!-- Google Sign-In Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogleSignIn"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="Continue with Google"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            app:icon="@android:drawable/ic_menu_search"
+            app:iconTint="@color/pastel_blue_dark"
+            app:iconGravity="textStart"
+            app:strokeColor="@color/border_color"
+            app:cornerRadius="16dp" />
+
         <!-- Sign Up Link -->
         <LinearLayout
             android:layout_width="wrap_content"

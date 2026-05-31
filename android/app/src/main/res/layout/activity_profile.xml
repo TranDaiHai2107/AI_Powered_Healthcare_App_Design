@@ -61,20 +61,42 @@
 
                     <!-- Avatar circle -->
                     <FrameLayout
-                        android:layout_width="72dp"
-                        android:layout_height="72dp">
+                        android:id="@+id/layoutAvatar"
+                        android:layout_width="88dp"
+                        android:layout_height="88dp">
 
                         <View
                             android:id="@+id/viewAvatar"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
 
+                        <ImageView
+                            android:id="@+id/imgAvatar"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clipToOutline="true"
+                            android:padding="4dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_profile" />
+
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center"
                             android:text="👤"
-                            android:textSize="32sp" />
+                            android:textSize="32sp"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="bottom|end"
+                            android:background="@drawable/bg_circle_mint"
+                            android:gravity="center"
+                            android:text="+"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                     </FrameLayout>
 
@@ -96,6 +118,15 @@
                         android:textColor="@color/healthcare_muted"
                         android:textSize="13sp"
                         tools:text="Patient ID: PT-001" />
+
+                    <TextView
+                        android:id="@+id/tvProfileMeta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="12sp"
+                        tools:text="Female - 1998-01-01" />
 
                     <!-- Info rows -->
                     <LinearLayout
@@ -543,6 +574,159 @@
                             android:text="Contact Support"
                             android:textColor="@color/healthcare_dark"
                             android:textSize="14sp" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_media_play"
+                            app:tint="@color/healthcare_muted" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+            
+            <!-- Staff Section (For Testing) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="16dp"
+                        android:paddingTop="12dp"
+                        android:text="Administrative"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <!-- Partner Dashboard -->
+                    <LinearLayout
+                        android:id="@+id/menuAdminDashboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@color/pastel_mint_20">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_manage"
+                                app:tint="@color/pastel_mint_dark" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Partner Admin Dashboard"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_media_play"
+                            app:tint="@color/healthcare_muted" />
+
+                    </LinearLayout>
+
+                    <!-- Staff Portal -->
+                    <LinearLayout
+                        android:id="@+id/menuStaffPortal"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@color/pastel_mint_20">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_camera"
+                                app:tint="@color/pastel_mint_dark" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Staff Mode: Scan QR"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@android:drawable/ic_media_play"
+                            app:tint="@color/healthcare_muted" />
+
+                    </LinearLayout>
+
+                    <!-- Staff Portal: Upload QR Image -->
+                    <LinearLayout
+                        android:id="@+id/menuStaffUploadQr"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@color/pastel_mint_20">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:layout_gravity="center"
+                                android:src="@android:drawable/ic_menu_gallery"
+                                app:tint="@color/pastel_mint_dark" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:text="Staff Mode: Upload QR"
+                            android:textColor="@color/healthcare_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
 
                         <ImageView
                             android:layout_width="20dp"

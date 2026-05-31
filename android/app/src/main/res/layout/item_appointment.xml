@@ -157,34 +157,112 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCheckIn"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                android:text="Check-in"
-                android:textColor="@color/white"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                app:backgroundTint="@color/pastel_blue"
-                app:cornerRadius="12dp" />
+            <!-- Check In / View Records row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnViewRecords"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="44dp"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                android:text="View Records"
-                android:textColor="@color/pastel_blue_dark"
-                android:textSize="13sp"
-                android:textAllCaps="false"
-                app:cornerRadius="12dp"
-                app:strokeColor="@color/pastel_blue" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCheckIn"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="Check-in"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:backgroundTint="@color/pastel_blue"
+                    app:cornerRadius="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewRecords"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="3dp"
+                    android:layout_marginEnd="3dp"
+                    android:text="View Records"
+                    android:textColor="@color/pastel_blue_dark"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/pastel_blue" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDownloadReceipt"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="3dp"
+                    android:text="Receipt"
+                    android:textColor="@color/pastel_blue_dark"
+                    android:textSize="13sp"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/pastel_blue" />
+
+            </LinearLayout>
+
+            <!-- Secondary Actions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCancel"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    android:text="Cancel"
+                    android:textColor="@color/red_700"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/red_cancel" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReschedule"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="Reschedule"
+                    android:textColor="@color/pastel_blue_dark"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/pastel_blue" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReview"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    android:text="Review"
+                    android:textColor="@color/pastel_blue_dark"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    app:cornerRadius="12dp"
+                    app:strokeColor="@color/pastel_blue" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

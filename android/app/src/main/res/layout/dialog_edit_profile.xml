@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_card"
+    android:fillViewport="false"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Personal Information"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:layout_width="92dp"
+            android:layout_height="92dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/imgDialogAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/bg_rounded_image"
+                android:clipToOutline="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_profile" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChangeAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="bottom|end"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:padding="0dp"
+                app:backgroundTint="@color/pastel_blue"
+                app:cornerRadius="20dp"
+                app:icon="@android:drawable/ic_menu_camera"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconTint="@color/healthcare_dark" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tvAvatarHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Tap camera to update avatar"
+            android:textColor="@color/healthcare_muted"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Full name"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="Full name"
+            android:inputType="textPersonName"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/healthcare_dark"
+            android:textColorHint="@color/healthcare_muted" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Phone"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="Phone number"
+            android:inputType="phone"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/healthcare_dark"
+            android:textColorHint="@color/healthcare_muted" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Birthday"
+                    android:textColor="@color/healthcare_text"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/etDateOfBirth"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_edit_text"
+                    android:hint="YYYY-MM-DD"
+                    android:inputType="date"
+                    android:paddingHorizontal="16dp"
+                    android:textColor="@color/healthcare_dark"
+                    android:textColorHint="@color/healthcare_muted" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Gender"
+                    android:textColor="@color/healthcare_text"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinnerGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_edit_text"
+                    android:paddingHorizontal="12dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Address"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etAddress"
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_edit_text"
+            android:gravity="top"
+            android:hint="Address"
+            android:inputType="textPostalAddress|textMultiLine"
+            android:padding="16dp"
+            android:textColor="@color/healthcare_dark"
+            android:textColorHint="@color/healthcare_muted" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChangePassword"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:text="Send password reset email"
+            android:textAllCaps="false"
+            android:textColor="@color/pastel_blue_dark"
+            app:cornerRadius="14dp"
+            app:strokeColor="@color/pastel_blue" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginEnd="10dp"
+                android:text="Cancel"
+                android:textAllCaps="false" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="Save"
+                android:textAllCaps="false"
+                android:textColor="@color/healthcare_dark"
+                app:backgroundTint="@color/pastel_blue"
+                app:cornerRadius="14dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

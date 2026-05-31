@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/healthcare_gray">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_rounded_card"
+            android:clipToOutline="true"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/healthcare_dark" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="Record Details"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- General Info -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/healthcare_dark"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        tools:text="General Checkup" />
+
+                    <TextView
+                        android:id="@+id/tvDoctorHospital"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/healthcare_text"
+                        android:textSize="14sp"
+                        tools:text="Dr. Smith — City Hospital" />
+
+                    <TextView
+                        android:id="@+id/tvDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/healthcare_muted"
+                        android:textSize="14sp"
+                        tools:text="May 10, 2026" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Diagnosis -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Diagnosis"
+                android:textColor="@color/healthcare_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/pastel_blue_10"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/pastel_blue_20"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/tvDiagnosis"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="14sp"
+                    tools:text="Upper respiratory tract infection (mild)" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Prescription -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Prescription"
+                android:textColor="@color/healthcare_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/pastel_mint_10"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/pastel_mint_20"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/tvPrescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textColor="@color/healthcare_dark"
+                    android:textSize="14sp"
+                    tools:text="Paracetamol 500mg x 3/day\nAmoxicillin 500mg x 2/day" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Attachments -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Attachments"
+                android:textColor="@color/healthcare_dark"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/layoutAttachments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpload"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Upload Attachment"
+                android:textAllCaps="false"
+                android:textColor="@color/pastel_blue_dark"
+                app:cornerRadius="12dp"
+                app:icon="@android:drawable/ic_menu_upload"
+                app:iconTint="@color/pastel_blue_dark"
+                app:strokeColor="@color/pastel_blue" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

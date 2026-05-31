@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_card"
+    android:fillViewport="false"
+    android:overScrollMode="never"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvDialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="Add Family Member"
+            android:textColor="@color/healthcare_dark"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Full Name *"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="e.g. John Doe"
+            android:inputType="textPersonName"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/healthcare_dark"
+            android:textColorHint="@color/healthcare_muted" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Relationship *"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinnerRelationship"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:entries="@array/relationship_options"
+            android:paddingHorizontal="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date of Birth *"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDob"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:gravity="center_vertical"
+            android:hint="Select Date"
+            android:paddingHorizontal="16dp"
+            android:textColorHint="@color/healthcare_muted"
+            android:textColor="@color/healthcare_dark" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gender *"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/rgGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rbMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="Male" />
+
+            <RadioButton
+                android:id="@+id/rbFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="Female" />
+
+            <RadioButton
+                android:id="@+id/rbOther"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phone (Optional)"
+            android:textColor="@color/healthcare_text"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/etPhone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:hint="e.g. +1234567890"
+            android:inputType="phone"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/healthcare_dark"
+            android:textColorHint="@color/healthcare_muted" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnCancel"
+                style="?attr/materialButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="Cancel"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/pastel_blue"
+                android:text="Save"
+                android:textAllCaps="false" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
