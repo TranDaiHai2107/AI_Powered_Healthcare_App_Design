@@ -6,20 +6,23 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.healthcare.app.databinding.ActivityConfirmationBinding;
-import com.healthcare.app.model.Doctor;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.File;
 import java.util.Locale;
-import java.util.UUID;
+
+import androidx.core.content.FileProvider;
+import android.net.Uri;
+import com.healthcare.app.util.ReceiptGenerator;
 
 public class ConfirmationActivity extends AppCompatActivity {
 
     private ActivityConfirmationBinding binding;
-    private FirebaseFirestore db;
-    private String doctorId;
+    private String appointmentId;
+    private String doctorName;
+    private String selectedDate;
+    private String selectedTime;
+    private String service;
     private double total;
 
     @Override
@@ -28,49 +31,67 @@ public class ConfirmationActivity extends AppCompatActivity {
         binding = ActivityConfirmationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        db = FirebaseFirestore.getInstance();
-        doctorId = getIntent().getStringExtra("doctorId");
+        appointmentId = getIntent().getStringExtra("appointmentId");
+        doctorName = getIntent().getStringExtra("doctorName");
+        selectedDate = getIntent().getStringExtra("date");
+        selectedTime = getIntent().getStringExtra("time");
+        service = getIntent().getStringExtra("service");
         total = getIntent().getDoubleExtra("total", 0);
 
-        setupBookingDetails();
-        setupClickListeners();
-        loadDoctor();
-    }
-
-    private void setupBookingDetails() {
-        String bookingId = "HC-" + new SimpleDateFormat("yyyyMMdd", Locale.US).format(new Date()) + "-" + UUID.randomUUID().toString().substring(0, 4).toUpperCase(Locale.US);
-        binding.tvBookingId.setText(bookingId);
-        binding.tvDate.setText(new SimpleDateFormat("MMM dd, yyyy", Locale.US).format(new Date()));
-        binding.tvTime.setText(new SimpleDateFormat("hh:mm a", Locale.US).format(new Date()));
+        binding.tvBookingId.setText(appointmentId != null ? appointmentId : "—");
+        binding.tvDoctor.setText(doctorName != null ? doctorName : "—");
+        binding.tvDate.setText(selectedDate != null ? selectedDate : "—");
+        binding.tvTime.setText(selectedTime != null ? selectedTime : "—");
         binding.tvTotal.setText(String.format(Locale.US, "$%.0f", total));
-    }
 
-    private void loadDoctor() {
-        if (doctorId == null) return;
-        db.collection("doctors").document(doctorId).get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) { Doctor doctor = doc.toObject(Doctor.class); if (doctor != null) binding.tvDoctor.setText(doctor.getName()); }
-                    else binding.tvDoctor.setText("—");
-                })
-                .addOnFailureListener(e -> binding.tvDoctor.setText("—"));
+        setupClickListeners();
     }
 
     private void setupClickListeners() {
-        binding.btnDownloadReceipt.setOnClickListener(v -> Toast.makeText(this, "Downloading receipt...", Toast.LENGTH_SHORT).show());
+        binding.btnDownloadReceipt.setOnClickListener(v -> generateAndDownloadReceipt());
+
         binding.btnViewAppointments.setOnClickListener(v -> {
             Intent intent = new Intent(this, AppointmentsActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent); finish();
+            startActivity(intent);
+            finish();
         });
+
         binding.btnBackToHome.setOnClickListener(v -> navigateToHome());
     }
 
     @SuppressWarnings("deprecation")
-    @Override public void onBackPressed() { navigateToHome(); }
+    @Override
+    public void onBackPressed() {
+        navigateToHome();
+    }
 
     private void navigateToHome() {
         Intent intent = new Intent(this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent); finish();
+        startActivity(intent);
+        finish();
+    }
+
+    private void generateAndDownloadReceipt() {
+        try {
+            File pdf = ReceiptGenerator.generateReceipt(this,
+                    appointmentId, doctorName, selectedDate, selectedTime,
+                    service != null ? service : "Consultation", total, "Card");
+
+            if (pdf != null) {
+                Uri uri = FileProvider.getUriForFile(this,
+                        getPackageName() + ".fileprovider", pdf);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(uri, "application/pdf");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(intent);
+                Toast.makeText(this, "Receipt saved to Downloads", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed to generate receipt", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to generate receipt", Toast.LENGTH_SHORT).show();
+        }
     }
 }
