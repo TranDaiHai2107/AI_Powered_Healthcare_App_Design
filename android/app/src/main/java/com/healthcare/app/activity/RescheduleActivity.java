@@ -31,6 +31,8 @@ public class RescheduleActivity extends AppCompatActivity {
 
     private String selectedDate = null;
     private String selectedTime = null;
+    private String todayDateStr;
+    private String doctorSlotsStr = null;
 
     private View lastSelectedDateView = null;
     private MaterialButton lastSelectedTimeBtn = null;
@@ -71,6 +73,8 @@ public class RescheduleActivity extends AppCompatActivity {
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEE", Locale.US);
         SimpleDateFormat dateNumFormat = new SimpleDateFormat("dd", Locale.US);
         SimpleDateFormat fullFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
+
+        todayDateStr = fullFormat.format(calendar.getTime());
 
         for (int i = 0; i < 7; i++) {
             Calendar day = (Calendar) calendar.clone();
@@ -113,6 +117,12 @@ public class RescheduleActivity extends AppCompatActivity {
                 tvDay.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
                 lastSelectedDateView = dateItem;
                 selectedDate = fullDate;
+
+                selectedTime = null;
+                lastSelectedTimeBtn = null;
+                if (doctorSlotsStr != null) {
+                    populateTimeSlots(doctorSlotsStr.split(","));
+                }
             });
             binding.layoutDateButtons.addView(dateItem);
         }
@@ -133,9 +143,9 @@ public class RescheduleActivity extends AppCompatActivity {
         db.collection("doctors").document(doctorId).get()
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
-                        String slots = doc.getString("availableSlots");
-                        if (slots != null) {
-                            populateTimeSlots(slots.split(","));
+                        doctorSlotsStr = doc.getString("availableSlots");
+                        if (doctorSlotsStr != null) {
+                            populateTimeSlots(doctorSlotsStr.split(","));
                         }
                     }
                 });
@@ -144,6 +154,9 @@ public class RescheduleActivity extends AppCompatActivity {
     private void populateTimeSlots(String[] slots) {
         binding.gridTimeSlots.removeAllViews();
         if (slots == null || slots.length == 0) return;
+
+        boolean isToday = selectedDate != null && selectedDate.equals(todayDateStr);
+
         for (String slot : slots) {
             String trimmed = slot.trim();
             if (trimmed.isEmpty()) continue;
@@ -151,9 +164,6 @@ public class RescheduleActivity extends AppCompatActivity {
             btn.setText(trimmed);
             btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             btn.setCornerRadius(dpToPx(16));
-            btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
-            btn.setStrokeColorResource(R.color.border_color);
-            btn.setBackgroundColor(getResources().getColor(R.color.white, null));
             btn.setAllCaps(false);
             btn.setMinHeight(dpToPx(40));
             btn.setMinimumHeight(dpToPx(40));
@@ -167,15 +177,46 @@ public class RescheduleActivity extends AppCompatActivity {
             gridParams.setGravity(Gravity.FILL_HORIZONTAL);
             btn.setLayoutParams(gridParams);
 
-            btn.setOnClickListener(v -> {
-                if (lastSelectedTimeBtn != null) {
-                    lastSelectedTimeBtn.setBackgroundColor(getResources().getColor(R.color.white, null));
-                }
-                btn.setBackgroundColor(getResources().getColor(R.color.pastel_blue, null));
-                lastSelectedTimeBtn = btn;
-                selectedTime = trimmed;
-            });
+            boolean isPast = isToday && isTimeInPast(trimmed);
+            if (isPast) {
+                btn.setEnabled(false);
+                btn.setTextColor(getResources().getColor(R.color.healthcare_muted, null));
+                btn.setStrokeColorResource(R.color.border_color);
+                btn.setBackgroundColor(getResources().getColor(R.color.healthcare_gray, null));
+            } else {
+                btn.setEnabled(true);
+                btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
+                btn.setStrokeColorResource(R.color.border_color);
+                btn.setBackgroundColor(getResources().getColor(R.color.white, null));
+                btn.setOnClickListener(v -> {
+                    if (lastSelectedTimeBtn != null) {
+                        lastSelectedTimeBtn.setBackgroundColor(getResources().getColor(R.color.white, null));
+                    }
+                    btn.setBackgroundColor(getResources().getColor(R.color.pastel_blue, null));
+                    lastSelectedTimeBtn = btn;
+                    selectedTime = trimmed;
+                });
+            }
             binding.gridTimeSlots.addView(btn);
+        }
+    }
+
+    private boolean isTimeInPast(String timeStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+            Calendar slotTime = Calendar.getInstance();
+            slotTime.setTime(sdf.parse(timeStr.trim()));
+
+            Calendar currentTime = Calendar.getInstance();
+
+            slotTime.set(Calendar.YEAR, currentTime.get(Calendar.YEAR));
+            slotTime.set(Calendar.MONTH, currentTime.get(Calendar.MONTH));
+            slotTime.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH));
+
+            return slotTime.before(currentTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
