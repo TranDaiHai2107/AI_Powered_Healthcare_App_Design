@@ -35,6 +35,7 @@ public class BookingActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String doctorId;
     private Doctor currentDoctor;
+    private String todayDateStr;
 
     private int currentStep = 1;
     private String selectedService = null;
@@ -109,6 +110,8 @@ public class BookingActivity extends AppCompatActivity {
         SimpleDateFormat dateNumFormat = new SimpleDateFormat("dd", Locale.US);
         SimpleDateFormat fullFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.US);
 
+        todayDateStr = fullFormat.format(calendar.getTime());
+
         for (int i = 0; i < 5; i++) {
             Calendar day = (Calendar) calendar.clone(); day.add(Calendar.DAY_OF_MONTH, i);
             String dayName = (i == 0) ? "Today" : dayFormat.format(day.getTime());
@@ -133,6 +136,12 @@ public class BookingActivity extends AppCompatActivity {
                 dateItem.setBackground(getDrawable(R.drawable.bg_date_selected));
                 tvDay.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
                 lastSelectedDateView = dateItem; selectedDate = fullDate;
+
+                selectedTime = null;
+                lastSelectedTimeBtn = null;
+                if (currentDoctor != null) {
+                    populateTimeSlots(currentDoctor.getAvailableSlotsArray());
+                }
             });
             binding.layoutDateButtons.addView(dateItem);
         }
@@ -151,23 +160,58 @@ public class BookingActivity extends AppCompatActivity {
     private void populateTimeSlots(String[] slots) {
         binding.gridTimeSlots.removeAllViews();
         if (slots == null || slots.length == 0) return;
+
+        boolean isToday = selectedDate != null && selectedDate.equals(todayDateStr);
+
         for (String slot : slots) {
             String trimmed = slot.trim(); if (trimmed.isEmpty()) continue;
             MaterialButton btn = new MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
             btn.setText(trimmed); btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13); btn.setCornerRadius(dpToPx(16));
-            btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null)); btn.setStrokeColorResource(R.color.border_color);
-            btn.setBackgroundColor(getResources().getColor(R.color.white, null)); btn.setAllCaps(false);
+            btn.setAllCaps(false);
             btn.setMinHeight(dpToPx(40)); btn.setMinimumHeight(dpToPx(40)); btn.setPadding(dpToPx(8), 0, dpToPx(8), 0);
+
             GridLayout.LayoutParams gridParams = new GridLayout.LayoutParams();
             gridParams.width = 0; gridParams.height = GridLayout.LayoutParams.WRAP_CONTENT;
             gridParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f);
             gridParams.setMargins(dpToPx(4), dpToPx(4), dpToPx(4), dpToPx(4)); gridParams.setGravity(Gravity.FILL_HORIZONTAL);
             btn.setLayoutParams(gridParams);
-            btn.setOnClickListener(v -> {
-                if (lastSelectedTimeBtn != null) { lastSelectedTimeBtn.setBackgroundColor(getResources().getColor(R.color.white, null)); }
-                btn.setBackgroundColor(getResources().getColor(R.color.pastel_blue, null)); lastSelectedTimeBtn = btn; selectedTime = trimmed;
-            });
+
+            boolean isPast = isToday && isTimeInPast(trimmed);
+            if (isPast) {
+                btn.setEnabled(false);
+                btn.setTextColor(getResources().getColor(R.color.healthcare_muted, null));
+                btn.setStrokeColorResource(R.color.border_color);
+                btn.setBackgroundColor(getResources().getColor(R.color.healthcare_gray, null));
+            } else {
+                btn.setEnabled(true);
+                btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
+                btn.setStrokeColorResource(R.color.border_color);
+                btn.setBackgroundColor(getResources().getColor(R.color.white, null));
+                btn.setOnClickListener(v -> {
+                    if (lastSelectedTimeBtn != null) { lastSelectedTimeBtn.setBackgroundColor(getResources().getColor(R.color.white, null)); }
+                    btn.setBackgroundColor(getResources().getColor(R.color.pastel_blue, null)); lastSelectedTimeBtn = btn; selectedTime = trimmed;
+                });
+            }
             binding.gridTimeSlots.addView(btn);
+        }
+    }
+
+    private boolean isTimeInPast(String timeStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+            Calendar slotTime = Calendar.getInstance();
+            slotTime.setTime(sdf.parse(timeStr.trim()));
+
+            Calendar currentTime = Calendar.getInstance();
+
+            slotTime.set(Calendar.YEAR, currentTime.get(Calendar.YEAR));
+            slotTime.set(Calendar.MONTH, currentTime.get(Calendar.MONTH));
+            slotTime.set(Calendar.DAY_OF_MONTH, currentTime.get(Calendar.DAY_OF_MONTH));
+
+            return slotTime.before(currentTime);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
