@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -55,6 +56,18 @@ public class AppSettingsActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(44), dp(20), dp(24));
         scrollView.addView(root);
+
+        ImageView btnBack = new ImageView(this);
+        btnBack.setImageResource(android.R.drawable.ic_menu_revert);
+        btnBack.setImageTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.healthcare_dark)));
+        btnBack.setBackground(getDrawable(R.drawable.bg_rounded_card));
+        btnBack.setPadding(dp(8), dp(8), dp(8), dp(8));
+        btnBack.setClipToOutline(true);
+        btnBack.setOnClickListener(v -> finish());
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(40), dp(40));
+        backParams.setMargins(0, 0, 0, dp(16));
+        btnBack.setLayoutParams(backParams);
+        root.addView(btnBack);
 
         root.addView(title("App Settings"));
         root.addView(body("Manage notifications, password security, privacy, and trusted devices."));
