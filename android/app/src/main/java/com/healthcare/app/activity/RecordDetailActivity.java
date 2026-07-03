@@ -19,6 +19,11 @@ import com.healthcare.app.R;
 import com.healthcare.app.databinding.ActivityRecordDetailBinding;
 import com.healthcare.app.model.MedicalRecord;
 
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class RecordDetailActivity extends AppCompatActivity {
@@ -91,9 +96,22 @@ public class RecordDetailActivity extends AppCompatActivity {
                 tv.setTextColor(getResources().getColor(R.color.pastel_blue_dark, null));
                 tv.setPadding(0, 8, 0, 8);
                 tv.setOnClickListener(v -> {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(url));
-                    startActivity(intent);
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        if (url.startsWith("file://")) {
+                            File file = new File(Uri.parse(url).getPath());
+                            Uri contentUri = FileProvider.getUriForFile(this,
+                                    getPackageName() + ".fileprovider", file);
+                            String mime = getContentResolver().getType(contentUri);
+                            intent.setDataAndType(contentUri, mime != null ? mime : "*/*");
+                            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } else {
+                            intent.setData(Uri.parse(url));
+                        }
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "No app found to open this attachment", Toast.LENGTH_SHORT).show();
+                    }
                 });
                 binding.layoutAttachments.addView(tv);
             }
@@ -104,28 +122,71 @@ public class RecordDetailActivity extends AppCompatActivity {
         Toast.makeText(this, "Uploading...", Toast.LENGTH_SHORT).show();
         binding.btnUpload.setEnabled(false);
 
-        String fileName = "attachment_" + System.currentTimeMillis();
-        StorageReference ref = FirebaseStorage.getInstance()
-                .getReference("attachments/" + recordId + "/" + fileName);
+        try {
+            String fileName = "attachment_" + System.currentTimeMillis();
+            StorageReference ref = FirebaseStorage.getInstance()
+                    .getReference("attachments/" + recordId + "/" + fileName);
 
-        ref.putFile(fileUri)
-                .addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
-                    String downloadUrl = uri.toString();
-                    db.collection("medical_records").document(recordId)
-                            .update("attachmentUrls", FieldValue.arrayUnion(downloadUrl))
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(this, "Uploaded successfully", Toast.LENGTH_SHORT).show();
-                                binding.btnUpload.setEnabled(true);
-                                loadRecord(); // Reload to show new attachment
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(this, "Failed to update record", Toast.LENGTH_SHORT).show();
-                                binding.btnUpload.setEnabled(true);
-                            });
-                }))
+            ref.putFile(fileUri)
+                    .addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                        saveAttachmentUrl(uri.toString());
+                    }))
+                    .addOnFailureListener(e -> handleUploadFallback(fileUri, e.getMessage()));
+        } catch (Exception e) {
+            handleUploadFallback(fileUri, e.getMessage());
+        }
+    }
+
+    private void handleUploadFallback(Uri fileUri, String errorMsg) {
+        String localPath = saveFileLocally(fileUri);
+        if (localPath != null) {
+            saveAttachmentUrl(localPath);
+        } else {
+            Toast.makeText(this, "Upload failed: " + errorMsg, Toast.LENGTH_SHORT).show();
+            binding.btnUpload.setEnabled(true);
+        }
+    }
+
+    private void saveAttachmentUrl(String url) {
+        db.collection("medical_records").document(recordId)
+                .update("attachmentUrls", FieldValue.arrayUnion(url))
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Uploaded successfully", Toast.LENGTH_SHORT).show();
+                    binding.btnUpload.setEnabled(true);
+                    loadRecord();
+                })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Failed to update record", Toast.LENGTH_SHORT).show();
                     binding.btnUpload.setEnabled(true);
                 });
+    }
+
+    private String saveFileLocally(Uri uri) {
+        try {
+            String fileName = "attachment_" + System.currentTimeMillis();
+            String extension = ".dat";
+            String type = getContentResolver().getType(uri);
+            if (type != null) {
+                if (type.contains("pdf")) {
+                    extension = ".pdf";
+                } else if (type.contains("image")) {
+                    extension = ".jpg";
+                }
+            }
+            File destFile = new File(getExternalFilesDir(null), fileName + extension);
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            OutputStream outputStream = new FileOutputStream(destFile);
+            byte[] buf = new byte[4096];
+            int len;
+            while ((len = inputStream.read(buf)) > 0) {
+                outputStream.write(buf, 0, len);
+            }
+            outputStream.close();
+            inputStream.close();
+            return Uri.fromFile(destFile).toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
