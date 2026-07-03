@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.healthcare.app.R;
 import com.healthcare.app.databinding.ActivityPaymentBinding;
 import com.healthcare.app.model.Doctor;
@@ -70,6 +72,11 @@ public class PaymentActivity extends AppCompatActivity {
 
         setupClickListeners();
         loadDoctor();
+
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (uid != null) {
+            loadSavedPaymentMethods(uid);
+        }
     }
 
     private void setupClickListeners() {
@@ -108,6 +115,12 @@ public class PaymentActivity extends AppCompatActivity {
     }
 
     private void selectPaymentMethod(LinearLayout btn, ImageView check, String method) {
+        for (int i = 0; i < savedMethodLayouts.size(); i++) {
+            savedMethodLayouts.get(i).setBackgroundResource(R.drawable.bg_payment_unselected);
+            savedMethodChecks.get(i).setVisibility(View.GONE);
+        }
+        selectedSavedMethodId = null;
+
         if (lastSelectedPayment != null) lastSelectedPayment.setBackgroundResource(R.drawable.bg_payment_unselected);
         if (lastSelectedCheck != null) lastSelectedCheck.setVisibility(View.GONE);
         btn.setBackgroundResource(R.drawable.bg_payment_selected);
@@ -170,9 +183,58 @@ public class PaymentActivity extends AppCompatActivity {
             return;
         }
 
+        if (selectedSavedMethodId == null && "card".equals(selectedPaymentMethod)) {
+            String cardNo = binding.etCardNumber.getText() != null ? binding.etCardNumber.getText().toString().trim() : "";
+            String expiry = binding.etExpiry.getText() != null ? binding.etExpiry.getText().toString().trim() : "";
+            String cvv = binding.etCvv.getText() != null ? binding.etCvv.getText().toString().trim() : "";
+            if (cardNo.length() < 16) {
+                Toast.makeText(this, "Please enter a valid 16-digit card number", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (expiry.isEmpty() || !expiry.contains("/")) {
+                Toast.makeText(this, "Please enter a valid expiry date (MM/YY)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (cvv.length() < 3) {
+                Toast.makeText(this, "Please enter a valid CVV", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
         binding.btnPay.setEnabled(false);
         binding.btnPay.setText("Processing...");
 
+        // Double-check if slot has reached its maximum capacity of 5 patients
+        db.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .whereEqualTo("date", selectedDate)
+                .whereEqualTo("time", selectedTime)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    int bookedCount = 0;
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        String status = doc.getString("status");
+                        if (status != null && !status.equalsIgnoreCase("cancelled")) {
+                            bookedCount++;
+                        }
+                    }
+
+                    if (bookedCount >= 5) {
+                        binding.btnPay.setEnabled(true);
+                        updateTotal();
+                        Toast.makeText(this, "This slot has just reached its maximum capacity of 5 patients. Please go back and select a different time.", Toast.LENGTH_LONG).show();
+                    } else {
+                        executeBookingCreation(uid);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    binding.btnPay.setEnabled(true);
+                    updateTotal();
+                    Toast.makeText(this, "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void executeBookingCreation(String uid) {
         double total = Math.max(0, consultationFee + SERVICE_FEE - discount);
         String paymentId = "PAY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         String appointmentId = "APT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -251,5 +313,105 @@ public class PaymentActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private String selectedSavedMethodId = null;
+    private java.util.List<LinearLayout> savedMethodLayouts = new java.util.ArrayList<>();
+    private java.util.List<ImageView> savedMethodChecks = new java.util.ArrayList<>();
+
+    private void loadSavedPaymentMethods(String uid) {
+        db.collection("payment_methods")
+                .whereEqualTo("userId", uid)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        binding.cardSavedMethods.setVisibility(View.VISIBLE);
+                        binding.layoutSavedMethodsList.removeAllViews();
+                        savedMethodLayouts.clear();
+                        savedMethodChecks.clear();
+
+                        for (QueryDocumentSnapshot doc : snapshot) {
+                            String methodId = doc.getId();
+                            String type = doc.getString("type");
+                            String label = doc.getString("label");
+                            String reference = doc.getString("reference");
+
+                            LinearLayout itemLayout = new LinearLayout(this);
+                            itemLayout.setOrientation(LinearLayout.HORIZONTAL);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT, dp(56));
+                            params.setMargins(0, dp(8), 0, 0);
+                            itemLayout.setLayoutParams(params);
+                            itemLayout.setBackgroundResource(R.drawable.bg_payment_unselected);
+                            itemLayout.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                            itemLayout.setPadding(dp(16), 0, dp(16), 0);
+
+                            ImageView icon = new ImageView(this);
+                            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(24), dp(24));
+                            icon.setLayoutParams(iconParams);
+                            if ("Card".equalsIgnoreCase(type)) {
+                                icon.setImageResource(android.R.drawable.ic_menu_info_details);
+                            } else if ("E-wallet".equalsIgnoreCase(type)) {
+                                icon.setImageResource(android.R.drawable.ic_menu_manage);
+                            } else {
+                                icon.setImageResource(android.R.drawable.ic_menu_myplaces);
+                            }
+                            icon.setImageTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.healthcare_dark)));
+                            itemLayout.addView(icon);
+
+                            TextView text = new TextView(this);
+                            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+                            textParams.setMarginStart(dp(12));
+                            text.setLayoutParams(textParams);
+                            text.setText(type + " - " + label + " (" + reference + ")");
+                            text.setTextColor(getColor(R.color.healthcare_dark));
+                            text.setTextSize(14);
+                            itemLayout.addView(text);
+
+                            ImageView check = new ImageView(this);
+                            LinearLayout.LayoutParams checkParams = new LinearLayout.LayoutParams(dp(20), dp(20));
+                            check.setLayoutParams(checkParams);
+                            check.setImageResource(android.R.drawable.checkbox_on_background);
+                            check.setImageTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.pastel_mint_dark)));
+                            check.setVisibility(View.GONE);
+                            itemLayout.addView(check);
+
+                            savedMethodLayouts.add(itemLayout);
+                            savedMethodChecks.add(check);
+
+                            itemLayout.setOnClickListener(v -> {
+                                selectSavedPaymentMethod(itemLayout, check, methodId, type);
+                            });
+
+                            binding.layoutSavedMethodsList.addView(itemLayout);
+                        }
+                    } else {
+                        binding.cardSavedMethods.setVisibility(View.GONE);
+                    }
+                });
+    }
+
+    private void selectSavedPaymentMethod(LinearLayout layout, ImageView check, String methodId, String type) {
+        if (lastSelectedPayment != null) lastSelectedPayment.setBackgroundResource(R.drawable.bg_payment_unselected);
+        if (lastSelectedCheck != null) lastSelectedCheck.setVisibility(View.GONE);
+        lastSelectedPayment = null;
+        lastSelectedCheck = null;
+        binding.cardDetails.setVisibility(View.GONE);
+
+        for (int i = 0; i < savedMethodLayouts.size(); i++) {
+            savedMethodLayouts.get(i).setBackgroundResource(R.drawable.bg_payment_unselected);
+            savedMethodChecks.get(i).setVisibility(View.GONE);
+        }
+
+        layout.setBackgroundResource(R.drawable.bg_payment_selected);
+        check.setVisibility(View.VISIBLE);
+
+        selectedPaymentMethod = type.toLowerCase();
+        selectedSavedMethodId = methodId;
+        binding.btnPay.setEnabled(true);
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources().getDisplayMetrics().density);
     }
 }
