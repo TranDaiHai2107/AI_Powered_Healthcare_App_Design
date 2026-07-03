@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.healthcare.app.R;
 
 import java.util.HashMap;
@@ -24,6 +26,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private LinearLayout metricsContainer;
+    private LinearLayout ticketsContainer;
+    private LinearLayout queueContainer;
     private EditText doctorIdInput;
     private EditText feeInput;
     private EditText slotsInput;
@@ -38,6 +42,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         buildUi();
         loadMetrics();
+        loadSupportTickets();
+        loadActiveQueue();
     }
 
     private void buildUi() {
@@ -47,6 +53,18 @@ public class AdminDashboardActivity extends AppCompatActivity {
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(dp(20), dp(44), dp(20), dp(24));
         scrollView.addView(root);
+
+        ImageView btnBack = new ImageView(this);
+        btnBack.setImageResource(android.R.drawable.ic_menu_revert);
+        btnBack.setImageTintList(android.content.res.ColorStateList.valueOf(getColor(R.color.healthcare_dark)));
+        btnBack.setBackground(getDrawable(R.drawable.bg_rounded_card));
+        btnBack.setPadding(dp(8), dp(8), dp(8), dp(8));
+        btnBack.setClipToOutline(true);
+        btnBack.setOnClickListener(v -> finish());
+        LinearLayout.LayoutParams backParams = new LinearLayout.LayoutParams(dp(40), dp(40));
+        backParams.setMargins(0, 0, 0, dp(16));
+        btnBack.setLayoutParams(backParams);
+        root.addView(btnBack);
 
         root.addView(title("Partner Admin"));
         root.addView(body("Manage queue check-in, doctor pricing, available slots, vouchers, banners, and operations reports."));
@@ -96,6 +114,16 @@ public class AdminDashboardActivity extends AppCompatActivity {
         saveBanner.setOnClickListener(v -> saveBanner());
         bannerCard.addView(saveBanner);
         root.addView(bannerCard);
+
+        root.addView(section("Support Tickets Management"));
+        ticketsContainer = new LinearLayout(this);
+        ticketsContainer.setOrientation(LinearLayout.VERTICAL);
+        root.addView(ticketsContainer);
+
+        root.addView(section("Active Patient Queue"));
+        queueContainer = new LinearLayout(this);
+        queueContainer.setOrientation(LinearLayout.VERTICAL);
+        root.addView(queueContainer);
 
         setContentView(scrollView);
     }
@@ -239,5 +267,106 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private int dp(int value) {
         return (int) (value * getResources().getDisplayMetrics().density);
+    }
+
+    private void loadSupportTickets() {
+        ticketsContainer.removeAllViews();
+        db.collection("support_tickets")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    ticketsContainer.removeAllViews();
+                    if (snapshot.isEmpty()) {
+                        ticketsContainer.addView(body("No support tickets found."));
+                        return;
+                    }
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        String category = doc.getString("category") != null ? doc.getString("category") : "General Support";
+                        String message = doc.getString("message") != null ? doc.getString("message") : "";
+                        String status = doc.getString("status") != null ? doc.getString("status") : "open";
+                        String docId = doc.getId();
+                        
+                        LinearLayout row = card();
+                        row.addView(section(category + " (Status: " + status + ")"));
+                        row.addView(body(message));
+                        
+                        if ("open".equalsIgnoreCase(status)) {
+                            MaterialButton resolveBtn = button("Mark Completed");
+                            resolveBtn.setOnClickListener(v -> {
+                                db.collection("support_tickets").document(docId).update("status", "completed")
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(this, "Ticket marked as completed", Toast.LENGTH_SHORT).show();
+                                            loadSupportTickets();
+                                            loadMetrics();
+                                        })
+                                        .addOnFailureListener(e -> Toast.makeText(this, "Failed to update ticket", Toast.LENGTH_SHORT).show());
+                            });
+                            row.addView(resolveBtn);
+                        }
+                        ticketsContainer.addView(row);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    ticketsContainer.removeAllViews();
+                    ticketsContainer.addView(body("Failed to load tickets: " + e.getMessage()));
+                });
+    }
+
+    private void loadActiveQueue() {
+        queueContainer.removeAllViews();
+        db.collection("appointments")
+                .whereIn("queueStatus", java.util.Arrays.asList("waiting", "consulting"))
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    queueContainer.removeAllViews();
+                    if (snapshot.isEmpty()) {
+                        queueContainer.addView(body("No patients currently in queue."));
+                        return;
+                    }
+                    for (QueryDocumentSnapshot doc : snapshot) {
+                        String id = doc.getString("appointmentId");
+                        String docName = doc.getString("doctorName");
+                        String time = doc.getString("timeSlot");
+                        String date = doc.getString("date");
+                        Long qNum = doc.getLong("queueNumber");
+                        String status = doc.getString("queueStatus");
+                        String docId = doc.getId();
+                        
+                        LinearLayout row = card();
+                        row.addView(section("Queue #" + (qNum != null ? qNum : "—") + " (" + status.toUpperCase(Locale.US) + ")"));
+                        row.addView(body("Doctor: " + docName + "\nTime: " + date + " at " + time + "\nID: " + id));
+                        
+                        if ("waiting".equalsIgnoreCase(status)) {
+                            MaterialButton callBtn = button("Call Patient (Start)");
+                            callBtn.setOnClickListener(v -> {
+                                db.collection("appointments").document(docId).update("queueStatus", "consulting")
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(this, "Consultation started", Toast.LENGTH_SHORT).show();
+                                            loadActiveQueue();
+                                            loadMetrics();
+                                        });
+                            });
+                            row.addView(callBtn);
+                        } else if ("consulting".equalsIgnoreCase(status)) {
+                            MaterialButton completeBtn = button("Complete Appointment");
+                            completeBtn.setOnClickListener(v -> {
+                                db.collection("appointments").document(docId).update(
+                                                "queueStatus", "completed",
+                                                "status", "completed"
+                                        )
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(this, "Consultation completed", Toast.LENGTH_SHORT).show();
+                                            loadActiveQueue();
+                                            loadMetrics();
+                                        });
+                            });
+                            row.addView(completeBtn);
+                        }
+                        queueContainer.addView(row);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    queueContainer.removeAllViews();
+                    queueContainer.addView(body("Failed to load queue: " + e.getMessage()));
+                });
     }
 }
