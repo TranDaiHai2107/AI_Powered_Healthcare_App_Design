@@ -296,34 +296,60 @@
                     android:textStyle="bold" />
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardMap"
                     android:layout_width="match_parent"
                     android:layout_height="160dp"
                     android:layout_marginTop="10dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?android:attr/selectableItemBackground"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp"
                     app:cardBackgroundColor="@color/pastel_blue_10">
 
-                    <LinearLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="vertical">
+                        android:layout_height="match_parent">
 
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:src="@android:drawable/ic_menu_mapmode"
-                            app:tint="@color/pastel_blue_dark" />
+                        <WebView
+                            android:id="@+id/webViewMap"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
-                            android:text="Map View"
-                            android:textColor="@color/healthcare_muted"
-                            android:textSize="14sp" />
+                        <View
+                            android:id="@+id/mapClickOverlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:clickable="false"
+                            android:focusable="false" />
 
-                    </LinearLayout>
+                        <LinearLayout
+                            android:id="@+id/layoutMapPlaceholder"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@android:drawable/ic_menu_mapmode"
+                                app:tint="@color/pastel_blue_dark" />
+
+                            <TextView
+                                android:id="@+id/tvMapPlaceholder"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="Loading Map..."
+                                android:textColor="@color/healthcare_muted"
+                                android:textSize="14sp" />
+
+                        </LinearLayout>
+
+                    </FrameLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
