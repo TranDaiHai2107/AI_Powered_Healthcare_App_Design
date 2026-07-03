@@ -42,6 +42,7 @@ public class StaffScanActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
+        binding.btnBack.setOnClickListener(v -> finish());
         binding.btnScan.setOnClickListener(v -> launchScanner());
         binding.btnScanNext.setOnClickListener(v -> {
             binding.cardResult.setVisibility(View.GONE);
