@@ -1,6 +1,8 @@
 package com.healthcare.app.activity;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.view.View;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -57,9 +59,41 @@ public class HospitalDetailActivity extends AppCompatActivity {
     private void setupClickListeners() {
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnBookAppointment.setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
-        binding.btnCall.setOnClickListener(v -> Toast.makeText(this, "Calling hospital...", Toast.LENGTH_SHORT).show());
-        binding.btnDirection.setOnClickListener(v -> Toast.makeText(this, "Opening directions...", Toast.LENGTH_SHORT).show());
+        binding.btnCall.setOnClickListener(v -> {
+            if (currentHospital != null && currentHospital.getPhone() != null) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + currentHospital.getPhone().trim()));
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Calling hospital...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        binding.btnDirection.setOnClickListener(v -> openDirections());
+        binding.cardMap.setOnClickListener(v -> openDirections());
         binding.tvSeeAllDoctors.setOnClickListener(v -> startActivity(new Intent(this, SearchActivity.class)));
+    }
+
+    private void openDirections() {
+        if (currentHospital != null && currentHospital.getLatitude() != null && currentHospital.getLongitude() != null) {
+            double lat = currentHospital.getLatitude();
+            double lon = currentHospital.getLongitude();
+            String name = currentHospital.getName();
+            
+            String uriString = String.format(Locale.US, "geo:%f,%f?q=%f,%f(%s)", lat, lon, lat, lon, Uri.encode(name));
+            Uri intentUri = Uri.parse(uriString);
+            
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, intentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(mapIntent);
+            } else {
+                Intent fallbackIntent = new Intent(Intent.ACTION_VIEW, intentUri);
+                startActivity(fallbackIntent);
+            }
+        } else {
+            Toast.makeText(this, "Location coordinates not available for this hospital", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadHospital() {
@@ -89,6 +123,39 @@ public class HospitalDetailActivity extends AppCompatActivity {
         binding.tvDistance.setText(hospital.getDistance() != null ? hospital.getDistance() : "N/A");
         Glide.with(this).load(hospital.getImage()).centerCrop().placeholder(R.drawable.bg_rounded_image).into(binding.imgHospital);
         populateSpecialties(hospital.getSpecialtiesArray());
+        setupInlineMap(hospital);
+    }
+
+    private void setupInlineMap(Hospital hospital) {
+        if (hospital.getLatitude() != null && hospital.getLongitude() != null) {
+            double lat = hospital.getLatitude();
+            double lon = hospital.getLongitude();
+            
+            double delta = 0.005;
+            double minLon = lon - delta;
+            double minLat = lat - delta;
+            double maxLon = lon + delta;
+            double maxLat = lat + delta;
+            
+            String mapUrl = String.format(Locale.US, 
+                "https://www.openstreetmap.org/export/embed.html?bbox=%f,%f,%f,%f&layer=mapnik&marker=%f,%f",
+                minLon, minLat, maxLon, maxLat, lat, lon
+            );
+            
+            binding.webViewMap.getSettings().setJavaScriptEnabled(true);
+            binding.webViewMap.setWebViewClient(new android.webkit.WebViewClient() {
+                @Override
+                public void onPageFinished(android.webkit.WebView view, String url) {
+                    binding.webViewMap.setVisibility(View.VISIBLE);
+                    binding.layoutMapPlaceholder.setVisibility(View.GONE);
+                }
+            });
+            binding.webViewMap.loadUrl(mapUrl);
+        } else {
+            binding.webViewMap.setVisibility(View.GONE);
+            binding.layoutMapPlaceholder.setVisibility(View.VISIBLE);
+            binding.tvMapPlaceholder.setText("Map not available");
+        }
     }
 
     private void populateSpecialties(String[] specialties) {
