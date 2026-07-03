@@ -241,6 +241,10 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/healthcare_dark"
+            app:strokeColor="@color/pastel_blue"
+            app:iconTint="@color/healthcare_dark"
             android:text="Download Receipt"
             app:icon="@android:drawable/stat_sys_download"
             app:iconGravity="textStart" />
@@ -259,6 +263,10 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="10dp"
+            android:backgroundTint="@color/white"
+            android:textColor="@color/healthcare_dark"
+            app:strokeColor="@color/pastel_blue"
+            app:iconTint="@color/healthcare_dark"
             android:text="Back to Home"
             app:icon="@android:drawable/ic_menu_revert"
             app:iconGravity="textStart" />
