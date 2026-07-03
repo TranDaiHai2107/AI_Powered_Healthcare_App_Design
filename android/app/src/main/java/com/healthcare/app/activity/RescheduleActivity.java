@@ -19,6 +19,11 @@ import com.healthcare.app.databinding.ActivityRescheduleBinding;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class RescheduleActivity extends AppCompatActivity {
 
@@ -108,6 +113,12 @@ public class RescheduleActivity extends AppCompatActivity {
             dateItem.addView(tvDay);
             dateItem.addView(tvDate);
 
+            if (i == 0) {
+                dateItem.setBackground(getDrawable(R.drawable.bg_date_selected));
+                tvDay.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
+                lastSelectedDateView = dateItem; selectedDate = fullDate;
+            }
+
             dateItem.setOnClickListener(v -> {
                 if (lastSelectedDateView != null) {
                     lastSelectedDateView.setBackground(getDrawable(R.drawable.bg_date_unselected));
@@ -121,7 +132,7 @@ public class RescheduleActivity extends AppCompatActivity {
                 selectedTime = null;
                 lastSelectedTimeBtn = null;
                 if (doctorSlotsStr != null) {
-                    populateTimeSlots(doctorSlotsStr.split(","));
+                    loadBookedSlotsAndPopulate(doctorSlotsStr.split(","));
                 }
             });
             binding.layoutDateButtons.addView(dateItem);
@@ -145,13 +156,65 @@ public class RescheduleActivity extends AppCompatActivity {
                     if (doc.exists()) {
                         doctorSlotsStr = doc.getString("availableSlots");
                         if (doctorSlotsStr != null) {
-                            populateTimeSlots(doctorSlotsStr.split(","));
+                            loadBookedSlotsAndPopulate(doctorSlotsStr.split(","));
                         }
                     }
                 });
     }
 
-    private void populateTimeSlots(String[] slots) {
+    private void loadBookedSlotsAndPopulate(String[] slots) {
+        String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getUid();
+        if (doctorId == null || selectedDate == null || uid == null) {
+            populateTimeSlots(slots, new HashMap<>(), new ArrayList<>());
+            return;
+        }
+
+        db.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .whereEqualTo("date", selectedDate)
+                .get()
+                .addOnSuccessListener(doctorSnapshot -> {
+                    Map<String, Integer> bookedCounts = new HashMap<>();
+                    for (QueryDocumentSnapshot doc : doctorSnapshot) {
+                        String status = doc.getString("status");
+                        if (status != null && !status.equalsIgnoreCase("cancelled")) {
+                            String time = doc.getString("time");
+                            if (time != null) {
+                                String trimmedTime = time.trim();
+                                bookedCounts.put(trimmedTime, bookedCounts.getOrDefault(trimmedTime, 0) + 1);
+                            }
+                        }
+                    }
+
+                    db.collection("appointments")
+                            .whereEqualTo("userId", uid)
+                            .whereEqualTo("date", selectedDate)
+                            .get()
+                            .addOnSuccessListener(userSnapshot -> {
+                                List<String> userBookedTimes = new ArrayList<>();
+                                for (QueryDocumentSnapshot doc : userSnapshot) {
+                                    String status = doc.getString("status");
+                                    String id = doc.getString("appointmentId");
+                                    if (status != null && !status.equalsIgnoreCase("cancelled")
+                                            && (id == null || !id.equals(appointmentId))) {
+                                        String time = doc.getString("time");
+                                        if (time != null) {
+                                            userBookedTimes.add(time.trim());
+                                        }
+                                    }
+                                }
+                                populateTimeSlots(slots, bookedCounts, userBookedTimes);
+                            })
+                            .addOnFailureListener(e -> {
+                                populateTimeSlots(slots, bookedCounts, new ArrayList<>());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    populateTimeSlots(slots, new HashMap<>(), new ArrayList<>());
+                });
+    }
+
+    private void populateTimeSlots(String[] slots, Map<String, Integer> bookedCounts, List<String> userBookedTimes) {
         binding.gridTimeSlots.removeAllViews();
         if (slots == null || slots.length == 0) return;
 
@@ -178,11 +241,26 @@ public class RescheduleActivity extends AppCompatActivity {
             btn.setLayoutParams(gridParams);
 
             boolean isPast = isToday && isTimeInPast(trimmed);
-            if (isPast) {
+            int bookedCount = bookedCounts.getOrDefault(trimmed, 0);
+            boolean isFull = bookedCount >= 5;
+            boolean isUserAlreadyBooked = false;
+            for (String userTime : userBookedTimes) {
+                if (userTime.equalsIgnoreCase(trimmed)) {
+                    isUserAlreadyBooked = true;
+                    break;
+                }
+            }
+
+            if (isPast || isFull || isUserAlreadyBooked) {
                 btn.setEnabled(false);
                 btn.setTextColor(getResources().getColor(R.color.healthcare_muted, null));
                 btn.setStrokeColorResource(R.color.border_color);
                 btn.setBackgroundColor(getResources().getColor(R.color.healthcare_gray, null));
+                if (isFull) {
+                    btn.setText(trimmed + " (Full)");
+                } else if (isUserAlreadyBooked) {
+                    btn.setText(trimmed + " (Booked)");
+                }
             } else {
                 btn.setEnabled(true);
                 btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
@@ -226,18 +304,93 @@ public class RescheduleActivity extends AppCompatActivity {
             return;
         }
 
-        db.collection("appointments").whereEqualTo("appointmentId", appointmentId).get()
+        binding.btnConfirmReschedule.setEnabled(false);
+
+        // 1. Double check doctor capacity for the new slot
+        db.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .whereEqualTo("date", selectedDate)
+                .whereEqualTo("time", selectedTime)
+                .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        String docId = querySnapshot.getDocuments().get(0).getId();
-                        db.collection("appointments").document(docId)
-                                .update("date", selectedDate, "time", selectedTime)
-                                .addOnSuccessListener(aVoid -> {
-                                    Toast.makeText(this, "Appointment rescheduled successfully!", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> Toast.makeText(this, "Failed to reschedule", Toast.LENGTH_SHORT).show());
+                    int bookedCount = 0;
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        String status = doc.getString("status");
+                        if (status != null && !status.equalsIgnoreCase("cancelled")) {
+                            bookedCount++;
+                        }
                     }
+
+                    if (bookedCount >= 5) {
+                        binding.btnConfirmReschedule.setEnabled(true);
+                        Toast.makeText(this, "This slot has just reached its maximum capacity of 5 patients. Please choose a different time.", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    // 2. Double check if this user already has an appointment at this time on this date
+                    // (ignoring the current appointment being rescheduled)
+                    String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getUid();
+                    if (uid == null) {
+                        binding.btnConfirmReschedule.setEnabled(true);
+                        Toast.makeText(this, "Session expired, please login.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    db.collection("appointments")
+                            .whereEqualTo("userId", uid)
+                            .whereEqualTo("date", selectedDate)
+                            .whereEqualTo("time", selectedTime)
+                            .get()
+                            .addOnSuccessListener(userSnapshot -> {
+                                boolean hasSelfBooking = false;
+                                for (QueryDocumentSnapshot doc : userSnapshot) {
+                                    String status = doc.getString("status");
+                                    String id = doc.getString("appointmentId");
+                                    if (status != null && !status.equalsIgnoreCase("cancelled")
+                                            && (id == null || !id.equals(appointmentId))) {
+                                        hasSelfBooking = true;
+                                        break;
+                                    }
+                                }
+
+                                if (hasSelfBooking) {
+                                    binding.btnConfirmReschedule.setEnabled(true);
+                                    Toast.makeText(this, "You already have another appointment scheduled at this time.", Toast.LENGTH_LONG).show();
+                                } else {
+                                    // 3. Actually reschedule
+                                    db.collection("appointments").whereEqualTo("appointmentId", appointmentId).get()
+                                            .addOnSuccessListener(aptSnapshot -> {
+                                                if (!aptSnapshot.isEmpty()) {
+                                                    String docId = aptSnapshot.getDocuments().get(0).getId();
+                                                    db.collection("appointments").document(docId)
+                                                            .update("date", selectedDate, "time", selectedTime)
+                                                            .addOnSuccessListener(aVoid -> {
+                                                                Toast.makeText(this, "Appointment rescheduled successfully!", Toast.LENGTH_SHORT).show();
+                                                                finish();
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                binding.btnConfirmReschedule.setEnabled(true);
+                                                                Toast.makeText(this, "Failed to reschedule: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                            });
+                                                } else {
+                                                    binding.btnConfirmReschedule.setEnabled(true);
+                                                    Toast.makeText(this, "Appointment record not found.", Toast.LENGTH_SHORT).show();
+                                                }
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                binding.btnConfirmReschedule.setEnabled(true);
+                                                Toast.makeText(this, "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            });
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                binding.btnConfirmReschedule.setEnabled(true);
+                                Toast.makeText(this, "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    binding.btnConfirmReschedule.setEnabled(true);
+                    Toast.makeText(this, "Verification failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
