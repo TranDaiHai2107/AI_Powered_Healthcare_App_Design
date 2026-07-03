@@ -140,6 +140,7 @@
                 android:paddingHorizontal="16dp">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardUpload"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
