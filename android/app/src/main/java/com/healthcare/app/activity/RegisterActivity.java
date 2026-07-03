@@ -69,6 +69,7 @@ public class RegisterActivity extends AppCompatActivity {
                         userData.put("phone", phone);
                         userData.put("patientId", patientId);
                         userData.put("address", "");
+                        userData.put("role", "customer");
 
                         FirebaseFirestore.getInstance()
                                 .collection("users")
