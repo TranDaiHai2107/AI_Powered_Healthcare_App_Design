@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.HashMap;
 import android.widget.ArrayAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -131,6 +133,12 @@ public class BookingActivity extends AppCompatActivity {
             tvDate.setTextColor(getResources().getColor(R.color.healthcare_dark, null)); tvDate.setTypeface(null, android.graphics.Typeface.BOLD); tvDate.setGravity(Gravity.CENTER);
             dateItem.addView(tvDay); dateItem.addView(tvDate);
 
+            if (i == 0) {
+                dateItem.setBackground(getDrawable(R.drawable.bg_date_selected));
+                tvDay.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
+                lastSelectedDateView = dateItem; selectedDate = fullDate;
+            }
+
             dateItem.setOnClickListener(v -> {
                 if (lastSelectedDateView != null) { lastSelectedDateView.setBackground(getDrawable(R.drawable.bg_date_unselected)); resetDateTextColors(lastSelectedDateView); }
                 dateItem.setBackground(getDrawable(R.drawable.bg_date_selected));
@@ -140,7 +148,7 @@ public class BookingActivity extends AppCompatActivity {
                 selectedTime = null;
                 lastSelectedTimeBtn = null;
                 if (currentDoctor != null) {
-                    populateTimeSlots(currentDoctor.getAvailableSlotsArray());
+                    loadBookedSlotsAndPopulate(currentDoctor.getAvailableSlotsArray());
                 }
             });
             binding.layoutDateButtons.addView(dateItem);
@@ -157,7 +165,57 @@ public class BookingActivity extends AppCompatActivity {
         }
     }
 
-    private void populateTimeSlots(String[] slots) {
+    private void loadBookedSlotsAndPopulate(String[] slots) {
+        String uid = FirebaseAuth.getInstance().getUid();
+        if (doctorId == null || selectedDate == null || uid == null) {
+            populateTimeSlots(slots, new HashMap<>(), new ArrayList<>());
+            return;
+        }
+
+        db.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .whereEqualTo("date", selectedDate)
+                .get()
+                .addOnSuccessListener(doctorSnapshot -> {
+                    Map<String, Integer> bookedCounts = new HashMap<>();
+                    for (QueryDocumentSnapshot doc : doctorSnapshot) {
+                        String status = doc.getString("status");
+                        if (status != null && !status.equalsIgnoreCase("cancelled")) {
+                            String time = doc.getString("time");
+                            if (time != null) {
+                                String trimmedTime = time.trim();
+                                bookedCounts.put(trimmedTime, bookedCounts.getOrDefault(trimmedTime, 0) + 1);
+                            }
+                        }
+                    }
+
+                    db.collection("appointments")
+                            .whereEqualTo("userId", uid)
+                            .whereEqualTo("date", selectedDate)
+                            .get()
+                            .addOnSuccessListener(userSnapshot -> {
+                                List<String> userBookedTimes = new ArrayList<>();
+                                for (QueryDocumentSnapshot doc : userSnapshot) {
+                                    String status = doc.getString("status");
+                                    if (status != null && !status.equalsIgnoreCase("cancelled")) {
+                                        String time = doc.getString("time");
+                                        if (time != null) {
+                                            userBookedTimes.add(time.trim());
+                                        }
+                                    }
+                                }
+                                populateTimeSlots(slots, bookedCounts, userBookedTimes);
+                            })
+                            .addOnFailureListener(e -> {
+                                populateTimeSlots(slots, bookedCounts, new ArrayList<>());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    populateTimeSlots(slots, new HashMap<>(), new ArrayList<>());
+                });
+    }
+
+    private void populateTimeSlots(String[] slots, Map<String, Integer> bookedCounts, List<String> userBookedTimes) {
         binding.gridTimeSlots.removeAllViews();
         if (slots == null || slots.length == 0) return;
 
@@ -177,11 +235,26 @@ public class BookingActivity extends AppCompatActivity {
             btn.setLayoutParams(gridParams);
 
             boolean isPast = isToday && isTimeInPast(trimmed);
-            if (isPast) {
+            int bookedCount = bookedCounts.getOrDefault(trimmed, 0);
+            boolean isFull = bookedCount >= 5;
+            boolean isUserAlreadyBooked = false;
+            for (String userTime : userBookedTimes) {
+                if (userTime.equalsIgnoreCase(trimmed)) {
+                    isUserAlreadyBooked = true;
+                    break;
+                }
+            }
+
+            if (isPast || isFull || isUserAlreadyBooked) {
                 btn.setEnabled(false);
                 btn.setTextColor(getResources().getColor(R.color.healthcare_muted, null));
                 btn.setStrokeColorResource(R.color.border_color);
                 btn.setBackgroundColor(getResources().getColor(R.color.healthcare_gray, null));
+                if (isFull) {
+                    btn.setText(trimmed + " (Full)");
+                } else if (isUserAlreadyBooked) {
+                    btn.setText(trimmed + " (Booked)");
+                }
             } else {
                 btn.setEnabled(true);
                 btn.setTextColor(getResources().getColor(R.color.healthcare_dark, null));
@@ -219,7 +292,15 @@ public class BookingActivity extends AppCompatActivity {
         if (doctorId == null) { Toast.makeText(this, "Invalid doctor", Toast.LENGTH_SHORT).show(); finish(); return; }
         db.collection("doctors").document(doctorId).get()
                 .addOnSuccessListener(doc -> {
-                    if (doc.exists()) { currentDoctor = doc.toObject(Doctor.class); if (currentDoctor != null) populateUI(currentDoctor); }
+                    if (doc.exists()) {
+                        currentDoctor = doc.toObject(Doctor.class);
+                        if (currentDoctor != null) {
+                            populateUI(currentDoctor);
+                            if (currentDoctor.getAvailableSlotsArray() != null) {
+                                loadBookedSlotsAndPopulate(currentDoctor.getAvailableSlotsArray());
+                            }
+                        }
+                    }
                     else Toast.makeText(this, "Doctor not found", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(this, "Failed to load doctor details", Toast.LENGTH_SHORT).show());
@@ -252,7 +333,6 @@ public class BookingActivity extends AppCompatActivity {
         binding.tvDoctorName.setText(doctor.getName()); binding.tvSpecialization.setText(doctor.getSpecialization());
         if (doctor.getConsultationFee() != null) binding.tvFee.setText(String.format(Locale.US, "$%.0f", doctor.getConsultationFee()));
         Glide.with(this).load(doctor.getImage()).centerCrop().placeholder(R.drawable.bg_rounded_image).into(binding.imgDoctor);
-        populateTimeSlots(doctor.getAvailableSlotsArray());
     }
 
     private void updateStep() {
